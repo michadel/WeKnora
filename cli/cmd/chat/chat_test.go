@@ -318,6 +318,29 @@ func TestChat_SDKError_MidStream_AbortsAsSSE(t *testing.T) {
 	}
 }
 
+func TestChat_TerminalSSEError_ClassifiesAsServerError(t *testing.T) {
+	_, _ = iostreams.SetForTest(t)
+	svc := &fakeChatService{
+		streamEvents: []*sdk.StreamResponse{
+			{ResponseType: sdk.ResponseTypeAnswer, Content: "partial"},
+			{ResponseType: sdk.ResponseTypeError, Content: "boom", Done: true},
+		},
+		streamErr: sdk.NewSSEStreamError("boom"),
+	}
+	opts := &Options{Query: "q", KBID: "kb"}
+	err := runChat(context.Background(), opts, textOpts(), svc)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+	var typed *cmdutil.Error
+	if !errors.As(err, &typed) {
+		t.Fatalf("expected *cmdutil.Error, got %T", err)
+	}
+	if typed.Code != cmdutil.CodeServerError {
+		t.Errorf("code: got %q want %q", typed.Code, cmdutil.CodeServerError)
+	}
+}
+
 func TestChat_ContextCancelled(t *testing.T) {
 	_, _ = iostreams.SetForTest(t)
 	ctx, cancel := context.WithCancel(context.Background())

@@ -576,6 +576,43 @@ func TestTool_SessionAsk_StreamAbort(t *testing.T) {
 	}
 }
 
+func TestTool_Chat_StreamErrorIncludesSessionDetail(t *testing.T) {
+	svc := &fakeSvc{
+		kbStreamEvents: []*sdk.StreamResponse{
+			{ResponseType: sdk.ResponseTypeAnswer, Content: "partial"},
+			{ResponseType: sdk.ResponseTypeError, Content: "boom", Done: true},
+		},
+		kbStreamErr: sdk.NewSSEStreamError("boom"),
+	}
+	c, _ := newTestServer(t, svc)
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	res, err := c.CallTool(ctx, &mcpsdk.CallToolParams{Name: "chat", Arguments: map[string]any{"kb_id": "kb_x", "query": "q"}})
+	if err != nil {
+		t.Fatalf("unexpected transport error: %v", err)
+	}
+	if !res.IsError {
+		t.Fatal("expected IsError=true on terminal stream error")
+	}
+	b, err := json.Marshal(res.StructuredContent)
+	if err != nil {
+		t.Fatalf("marshal structured content: %v", err)
+	}
+	var detail struct {
+		Type   string         `json:"type"`
+		Detail map[string]any `json:"detail"`
+	}
+	if err := json.Unmarshal(b, &detail); err != nil {
+		t.Fatalf("unmarshal error detail: %v", err)
+	}
+	if detail.Type != "server.error" {
+		t.Errorf("type=%q, want server.error", detail.Type)
+	}
+	if detail.Detail["session_id"] != "sess_auto" {
+		t.Errorf("detail=%v, want session_id sess_auto", detail.Detail)
+	}
+}
+
 func TestTool_ChunkList_Happy(t *testing.T) {
 	svc := &fakeSvc{
 		chunks:      []sdk.Chunk{{ID: "c1", ChunkIndex: 0, Content: "hello"}},

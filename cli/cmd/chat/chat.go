@@ -218,7 +218,7 @@ func runChatNDJSON(ctx context.Context, opts *Options, sessionID string, svc Cha
 		if cmdutil.IsCancelled(ctx, err) {
 			return cmdutil.Wrapf(cmdutil.CodeOperationCancelled, err, "chat cancelled")
 		}
-		return cmdutil.WrapHTTP(err, "knowledge qa stream")
+		return cmdutil.WrapStream(err, "knowledge qa stream")
 	}
 	return nil
 }
@@ -265,7 +265,7 @@ func runChatText(ctx context.Context, opts *Options, sessionID string, autoCreat
 		}
 		// Pre-stream HTTP / transport failure: route through the canonical
 		// classifier so 401 / 404 / 5xx still surface their specific codes.
-		return cmdutil.WrapHTTP(streamErr, "knowledge qa stream")
+		return cmdutil.WrapStream(streamErr, "knowledge qa stream")
 	}
 
 	// SDK returned nil but we never saw a Done event - server closed the
@@ -304,7 +304,7 @@ func runChatJSON(ctx context.Context, opts *Options, fopts *cmdutil.FormatOption
 		if cmdutil.IsCancelled(ctx, err) {
 			return chatStreamError(cmdutil.Wrapf(cmdutil.CodeOperationCancelled, err, "chat cancelled"), sessionID, projector.AssistantMessageID())
 		}
-		return chatStreamError(cmdutil.WrapHTTP(err, "knowledge qa stream"), sessionID, projector.AssistantMessageID())
+		return chatStreamError(cmdutil.WrapStream(err, "knowledge qa stream"), sessionID, projector.AssistantMessageID())
 	}
 	if !projector.Done() {
 		return chatStreamError(

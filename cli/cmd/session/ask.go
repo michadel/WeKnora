@@ -190,7 +190,7 @@ func runAskNDJSON(ctx context.Context, opts *AskOptions, sessionID string, svc A
 		if cmdutil.IsCancelled(ctx, err) {
 			return cmdutil.Wrapf(cmdutil.CodeOperationCancelled, err, "session ask cancelled")
 		}
-		return cmdutil.WrapHTTP(err, "agent-chat stream")
+		return cmdutil.WrapStream(err, "agent-chat stream")
 	}
 	return nil
 }
@@ -226,7 +226,7 @@ func runAskText(ctx context.Context, opts *AskOptions, sessionID string, autoCre
 		if projector.Seen() && !projector.Done() {
 			return cmdutil.Wrapf(cmdutil.CodeSSEStreamAborted, streamErr, "stream aborted before completion")
 		}
-		return cmdutil.WrapHTTP(streamErr, "agent-chat stream")
+		return cmdutil.WrapStream(streamErr, "agent-chat stream")
 	}
 
 	// Server closed cleanly but never sent a complete event — treat as aborted
@@ -260,7 +260,7 @@ func runAskJSON(ctx context.Context, opts *AskOptions, fopts *cmdutil.FormatOpti
 		if cmdutil.IsCancelled(ctx, err) {
 			return askStreamError(cmdutil.Wrapf(cmdutil.CodeOperationCancelled, err, "session ask cancelled"), sessionID)
 		}
-		return askStreamError(cmdutil.WrapHTTP(err, "agent-chat stream"), sessionID)
+		return askStreamError(cmdutil.WrapStream(err, "agent-chat stream"), sessionID)
 	}
 	if !projector.Done() {
 		return askStreamError(

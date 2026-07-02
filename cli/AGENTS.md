@@ -89,10 +89,10 @@ text` renders the same projection live.
 
 ```
 {"type":"init","session_id":"...","kb_id":"...","profile":"...","agent_id":"..."}
-{"type":"thinking","content":"..."}
-{"type":"answer","content":"Hello"}
-{"type":"tool_call","name":"...","input":{}}
-{"type":"complete","done":true}
+{"response_type":"thinking","content":"..."}
+{"response_type":"answer","content":"Hello"}
+{"response_type":"tool_call","tool_calls":[...]}
+{"response_type":"complete","done":true}
 ```
 
 MCP `chat` / `session_ask` return the same `events` shape and accept
@@ -223,7 +223,7 @@ Key packages:
 - `internal/iostreams/` — global IO singleton + TTY detection + `SetForTest` swap
 - `internal/secrets/` — `Store` interface; `KeyringStore` primary, `FileStore` 0600 fallback, `MemStore` for tests
 - `internal/prompt/` — `TTYPrompter` (password no-echo) + `AgentPrompter` (non-TTY no-prompt sentinel)
-- `internal/sse/` — `Accumulator` for chat / session ask SSE streams
+- `internal/sse/` — `Projector` for chat / session ask bounded output; `Accumulator` remains for legacy/tests
 - `internal/mcp/` — curated 10-tool stdio MCP server (wired by `cmd/mcp/serve.go`); see [MCP tool surface](#mcp-tool-surface) for the curation rationale and inventory
 - `client/` (parent module) — generated SDK
 

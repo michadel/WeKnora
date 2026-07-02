@@ -321,7 +321,7 @@ func (c *Client) KnowledgeQAStream(
 					return err
 				}
 				if streamResponse.ResponseType == ResponseTypeError && streamResponse.Done {
-					return fmt.Errorf("SSE stream error: %s", streamResponse.Content)
+					return NewSSEStreamError(streamResponse.Content)
 				}
 				dataBuffer = ""
 				eventType = ""
@@ -396,7 +396,7 @@ func (c *Client) ContinueStream(
 					return err
 				}
 				if streamResponse.ResponseType == ResponseTypeError && streamResponse.Done {
-					return fmt.Errorf("SSE stream error: %s", streamResponse.Content)
+					return NewSSEStreamError(streamResponse.Content)
 				}
 				dataBuffer = ""
 				eventType = ""

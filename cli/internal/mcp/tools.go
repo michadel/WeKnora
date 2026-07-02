@@ -45,6 +45,18 @@ func toolErrorResult(err error) *mcpsdk.CallToolResult {
 	}
 }
 
+func streamErrorDetail(sessionID, assistantMessageID string) map[string]any {
+	detail := map[string]any{"session_id": sessionID}
+	if assistantMessageID != "" {
+		detail["assistant_message_id"] = assistantMessageID
+	}
+	return detail
+}
+
+func toolStreamError(err *cmdutil.Error, sessionID, assistantMessageID string) *mcpsdk.CallToolResult {
+	return toolErrorResult(err.WithDetail(streamErrorDetail(sessionID, assistantMessageID)))
+}
+
 // successResult builds a CallToolResult with StructuredContent = payload.
 // Using Out=any in all handlers disables the SDK auto-marshal path (which
 // would overwrite our StructuredContent with a zero-struct when the handler
@@ -484,10 +496,10 @@ func addChat(server *mcpsdk.Server, svc chatService) {
 			return nil
 		})
 		if streamErr != nil {
-			return toolErrorResult(cmdutil.WrapHTTP(streamErr, "knowledge qa stream")), nil, nil
+			return toolStreamError(cmdutil.WrapStream(streamErr, "knowledge qa stream"), sessionID, projector.AssistantMessageID()), nil, nil
 		}
 		if !projector.Done() {
-			return toolErrorResult(cmdutil.NewError(cmdutil.CodeSSEStreamAborted, "stream ended without a terminal event")), nil, nil
+			return toolStreamError(cmdutil.NewError(cmdutil.CodeSSEStreamAborted, "stream ended without a terminal event"), sessionID, projector.AssistantMessageID()), nil, nil
 		}
 		sid := projector.SessionID()
 		if sid == "" {
@@ -594,10 +606,10 @@ func addSessionAsk(server *mcpsdk.Server, svc sessionAskService) {
 			return nil
 		})
 		if streamErr != nil {
-			return toolErrorResult(cmdutil.WrapHTTP(streamErr, "agent-chat stream")), nil, nil
+			return toolStreamError(cmdutil.WrapStream(streamErr, "agent-chat stream"), sessionID, ""), nil, nil
 		}
 		if !projector.Done() {
-			return toolErrorResult(cmdutil.NewError(cmdutil.CodeSSEStreamAborted, "stream ended without a terminal event")), nil, nil
+			return toolStreamError(cmdutil.NewError(cmdutil.CodeSSEStreamAborted, "stream ended without a terminal event"), sessionID, ""), nil, nil
 		}
 		return successResult(sessionAskOutput{
 			Events:    events,

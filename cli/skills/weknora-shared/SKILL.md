@@ -2,7 +2,7 @@
 name: weknora-shared
 description: Use when driving a WeKnora RAG server through the `weknora` CLI as an agent — authenticating, managing knowledge bases / documents / sessions / agents, running search or chat, or interpreting the CLI's JSON envelopes and exit codes. Read this before any other weknora-* skill.
 metadata:
-  tested_against: v0.9
+  tested_against: v0.10
 ---
 
 # WeKnora CLI — shared base

@@ -64,6 +64,9 @@ func (p *Projector) Chat(r *sdk.StreamResponse) (ProjectedEvent, bool) {
 	if r.ResponseType == sdk.ResponseTypeComplete {
 		p.done = true
 	}
+	if r.ResponseType == sdk.ResponseTypeError && r.Done {
+		p.done = true
+	}
 
 	responseType := string(r.ResponseType)
 	isAnswer := r.ResponseType == sdk.ResponseTypeAnswer || (r.ResponseType == "" && r.Content != "")
@@ -101,6 +104,9 @@ func (p *Projector) Agent(r *sdk.AgentStreamResponse) (ProjectedEvent, bool) {
 	}
 	p.seen = true
 	if r.ResponseType == sdk.AgentResponseTypeComplete {
+		p.done = true
+	}
+	if r.ResponseType == sdk.AgentResponseTypeError && r.Done {
 		p.done = true
 	}
 

@@ -111,6 +111,28 @@ func TestProjector_VerboseDoesNotImplicitlyAddReferences(t *testing.T) {
 	}
 }
 
+func TestProjector_TerminalErrorMarksDone(t *testing.T) {
+	p := sse.NewProjector(false, false, "kb")
+	_, include := p.Chat(&sdk.StreamResponse{
+		ResponseType: sdk.ResponseTypeAnswer,
+		Content:      "partial",
+	})
+	if !include || p.Done() {
+		t.Fatalf("answer frame: include=%v done=%v", include, p.Done())
+	}
+	_, include = p.Chat(&sdk.StreamResponse{
+		ResponseType: sdk.ResponseTypeError,
+		Content:      "boom",
+		Done:         true,
+	})
+	if include {
+		t.Fatal("default projection should not include terminal error event")
+	}
+	if !p.Done() {
+		t.Fatal("terminal error did not mark projector done")
+	}
+}
+
 func TestTextRenderer_StreamsSelectedEvents(t *testing.T) {
 	var out bytes.Buffer
 	r := sse.NewTextRenderer(&out, true)
