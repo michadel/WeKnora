@@ -112,15 +112,25 @@ const defaultSettings: Settings = {
 
 /** Keep builtin agent id and isAgentEnabled in sync after localStorage reload. */
 function loadAndReconcileSettings(): Settings {
-  const loaded = JSON.parse(
-    localStorage.getItem("WeKnora_settings") || JSON.stringify(defaultSettings),
-  ) as Settings;
+  let loaded: Settings;
+  try {
+    const raw = localStorage.getItem("WeKnora_settings");
+    loaded = raw ? (JSON.parse(raw) as Settings) : { ...defaultSettings };
+  } catch (e) {
+    console.error("[settings] Failed to parse WeKnora_settings from localStorage, resetting to defaults:", e);
+    localStorage.removeItem("WeKnora_settings");
+    return { ...defaultSettings };
+  }
   loaded.selectedTags ||= [];
   loaded.selectedMCPServices ||= [];
   loaded.selectedSkills ||= loaded.selectedTools || [];
   loaded.selectedFileKbMap ||= {};
   if (reconcileBuiltinAgentMode(loaded)) {
-    localStorage.setItem("WeKnora_settings", JSON.stringify(loaded));
+    try {
+      localStorage.setItem("WeKnora_settings", JSON.stringify(loaded));
+    } catch {
+      /* quota exceeded — non-critical */
+    }
   }
   return loaded;
 }
