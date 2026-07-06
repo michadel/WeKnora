@@ -306,7 +306,7 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
         </div>
 
         <div class="cell cell-actions" v-if="canEdit" @click.stop>
-          <t-popup placement="bottom-right" trigger="click" destroy-on-close
+          <t-popup placement="bottom-right" trigger="click" destroy-on-close overlay-class-name="card-more"
             :on-visible-change="(v: boolean) => onMoreVisible(item.id, v)">
             <button class="row-more-btn" :class="{ active: moreOpen === item.id }" type="button"
               :aria-label="t('knowledgeBase.columnActions')">
@@ -314,7 +314,7 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
             </button>
             <template #content>
               <!-- Normal menu -->
-              <div v-if="moveMenuMode === 'normal'" class="row-menu">
+              <div v-if="moveMenuMode === 'normal'" class="card-menu">
                 <DocumentActionMenu
                   :item="item"
                   :can-mutate-knowledge="canMutateKnowledge"
@@ -330,7 +330,7 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
               </div>
 
               <!-- Move: target KB list -->
-              <div v-else-if="moveMenuMode === 'targets'" class="row-menu move-menu">
+              <div v-else-if="moveMenuMode === 'targets'" class="card-menu move-menu">
                 <div class="move-menu-header" @click.stop="emit('move-back')">
                   <t-icon name="chevron-left" size="16px" />
                   <span>{{ $t('knowledgeBase.moveToKnowledgeBase') }}</span>
@@ -342,7 +342,7 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
                   {{ $t('knowledgeBase.moveNoTargets') }}
                 </div>
                 <template v-else>
-                  <div v-for="kb in moveTargetKbs" :key="kb.id" class="row-menu-item"
+                  <div v-for="kb in moveTargetKbs" :key="kb.id" class="card-menu-item"
                     @click.stop="emit('move-select-target', kb)">
                     <t-icon class="icon" name="root-list" />
                     <span class="move-target-name">{{ kb.name }}</span>
@@ -352,7 +352,7 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
               </div>
 
               <!-- Move: confirm with mode selection -->
-              <div v-else-if="moveMenuMode === 'confirm'" class="row-menu move-menu">
+              <div v-else-if="moveMenuMode === 'confirm'" class="card-menu move-menu">
                 <div class="move-menu-header" @click.stop="emit('move-back')">
                   <t-icon name="chevron-left" size="16px" />
                   <span>{{ $t('knowledgeBase.moveConfirmTitle') }}</span>
@@ -733,187 +733,4 @@ const handleAction = (action: 'edit' | 'reparse' | 'cancel-parse' | 'move' | 'de
   }
 }
 
-.row-menu {
-  display: flex;
-  flex-direction: column;
-  min-width: 140px;
-  gap: 2px;
-  padding: 4px 6px;
-
-  &.move-menu {
-    min-width: 220px;
-    max-width: 280px;
-    max-height: 360px;
-    overflow-y: auto;
-    padding: 0;
-    gap: 0;
-  }
-}
-
-.move-menu-header {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--td-text-color-primary);
-  border-bottom: 1px solid var(--td-component-stroke);
-  cursor: pointer;
-
-  &:hover {
-    background: var(--td-bg-color-container-hover);
-  }
-}
-
-.move-menu-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px 0;
-}
-
-.move-menu-empty {
-  padding: 12px 16px;
-  font-size: 12px;
-  color: var(--td-text-color-placeholder);
-  text-align: center;
-  line-height: 1.5;
-}
-
-.move-target-name {
-  flex: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.move-target-count {
-  font-size: 12px;
-  color: var(--td-text-color-placeholder);
-}
-
-.move-confirm-body {
-  padding: 8px;
-
-  .move-target-info {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 8px;
-    background: var(--td-bg-color-container-hover);
-    border-radius: 6px;
-    font-size: 13px;
-    color: var(--td-text-color-secondary);
-    margin-bottom: 8px;
-  }
-
-  .move-mode-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 6px;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 4px;
-
-    &:hover {
-      background: var(--td-bg-color-container-hover);
-    }
-
-    &.active {
-      background: var(--td-brand-color-light);
-    }
-
-    .move-mode-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-
-      .move-mode-label {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--td-text-color-primary);
-      }
-
-      .move-mode-desc {
-        font-size: 11px;
-        color: var(--td-text-color-placeholder);
-        line-height: 1.4;
-      }
-    }
-  }
-
-  .move-confirm-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 8px;
-  }
-}
-
-.row-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--td-text-color-primary);
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background-color 0.15s cubic-bezier(0.2, 0, 0, 1), transform 0.12s ease;
-
-  &:hover {
-    background: var(--td-bg-color-container-hover);
-  }
-
-  &:active {
-    background: var(--td-bg-color-container-active);
-    transform: scale(0.98);
-  }
-
-  .icon {
-    font-size: 16px;
-    color: var(--td-text-color-secondary);
-    transition: color 0.15s ease;
-  }
-
-  &:hover .icon {
-    color: var(--td-text-color-primary);
-  }
-
-  &.danger {
-    color: var(--td-error-color-6);
-    margin-top: 4px;
-    position: relative;
-
-    &::before {
-      content: '';
-      position: absolute;
-      top: -3px;
-      left: 8px;
-      right: 8px;
-      height: 1px;
-      background: var(--td-component-stroke);
-    }
-
-    .icon {
-      color: var(--td-error-color-6);
-    }
-
-    &:hover {
-      background: var(--td-error-color-1);
-      color: var(--td-error-color-6);
-
-      .icon {
-        color: var(--td-error-color-6);
-      }
-    }
-
-    &:active {
-      background: var(--td-error-color-2);
-    }
-  }
-}
 </style>

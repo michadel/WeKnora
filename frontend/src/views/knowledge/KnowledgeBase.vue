@@ -360,6 +360,7 @@ async function probeTraceAvailable(item: KnowledgeCard) {
 }
 
 const onCardMoreVisibleChange = (visible: boolean, item: KnowledgeCard) => {
+  onVisibleChange(visible);
   if (visible) {
     probeTraceAvailable(item);
   }
