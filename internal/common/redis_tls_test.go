@@ -5,8 +5,16 @@ import (
 	"testing"
 )
 
+func resetRedisTLSEnv(t *testing.T) {
+	t.Helper()
+	t.Setenv("REDIS_USE_TLS", "")
+	t.Setenv("REDIS_TLS_SERVER_NAME", "")
+	t.Setenv("REDIS_TLS_INSECURE_SKIP_VERIFY", "")
+}
+
 func TestRedisTLSConfig_DisabledByDefault(t *testing.T) {
-	// REDIS_USE_TLS unset.
+	resetRedisTLSEnv(t)
+
 	if cfg := RedisTLSConfig(); cfg != nil {
 		t.Fatalf("expected nil tls.Config when REDIS_USE_TLS is unset, got %#v", cfg)
 	}
@@ -18,6 +26,7 @@ func TestRedisTLSConfig_DisabledByDefault(t *testing.T) {
 }
 
 func TestRedisTLSConfig_EnabledSecureByDefault(t *testing.T) {
+	resetRedisTLSEnv(t)
 	t.Setenv("REDIS_USE_TLS", "true")
 
 	cfg := RedisTLSConfig()
@@ -36,6 +45,7 @@ func TestRedisTLSConfig_EnabledSecureByDefault(t *testing.T) {
 }
 
 func TestRedisTLSConfig_Options(t *testing.T) {
+	resetRedisTLSEnv(t)
 	t.Setenv("REDIS_USE_TLS", "TRUE") // case-insensitive
 	t.Setenv("REDIS_TLS_SERVER_NAME", "redis.example.com")
 	t.Setenv("REDIS_TLS_INSECURE_SKIP_VERIFY", "true")
