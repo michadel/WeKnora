@@ -79,76 +79,78 @@ const allowedProviders = ref<string[]>([])
 const hasAnyConfig = ref(false)
 
 const engineOptions = computed(() => {
-  const statusMap: Record<string, boolean> = {}
-  const allowedMap: Record<string, boolean> = {}
-  for (const e of engineStatus.value) {
-    statusMap[e.name] = e.available
-    allowedMap[e.name] = e.allowed !== false
+  const statusByName = new Map(engineStatus.value.map((engine) => [engine.name, engine]))
+  const allowedSet = new Set(allowedProviders.value)
+  const hasStatus = engineStatus.value.length > 0
+  const hasAllowedList = allowedProviders.value.length > 0
+  const resolveState = (name: string, fallbackAvailable = false) => {
+    const status = statusByName.get(name)
+    const allowed = status?.allowed ?? (hasAllowedList ? allowedSet.has(name) : !hasStatus)
+    const available = status?.available ?? fallbackAvailable
+    return {
+      allowed,
+      available,
+      disabled: !allowed || !available,
+    }
   }
+
+  const local = resolveState('local', true)
+  const minio = resolveState('minio')
+  const cos = resolveState('cos')
+  const tos = resolveState('tos')
+  const s3 = resolveState('s3')
+  const oss = resolveState('oss')
+  const ks3 = resolveState('ks3')
+  const obs = resolveState('obs')
+
   return [
     {
       value: 'local',
       label: t('kbSettings.storage.engineLocal'),
       desc: t('kbSettings.storage.engineLocalDesc'),
-      allowed: allowedMap.local !== false,
-      available: statusMap.local !== false,
-      disabled: allowedMap.local === false,
+      ...local,
     },
     {
       value: 'minio',
       label: 'MinIO',
       desc: t('kbSettings.storage.engineMinioDesc'),
-      allowed: allowedMap.minio !== false,
-      available: statusMap.minio,
-      disabled: allowedMap.minio === false || statusMap.minio === false,
+      ...minio,
     },
     {
       value: 'cos',
       label: t('kbSettings.storage.engineCos'),
       desc: t('kbSettings.storage.engineCosDesc'),
-      allowed: allowedMap.cos !== false,
-      available: statusMap.cos,
-      disabled: allowedMap.cos === false || statusMap.cos === false,
+      ...cos,
     },
     {
       value: 'tos',
       label: t('kbSettings.storage.engineTos'),
       desc: t('kbSettings.storage.engineTosDesc'),
-      allowed: allowedMap.tos !== false,
-      available: statusMap.tos,
-      disabled: allowedMap.tos === false || statusMap.tos === false,
+      ...tos,
     },
     {
       value: 's3',
       label: t('kbSettings.storage.engineS3'),
       desc: t('kbSettings.storage.engineS3Desc'),
-      allowed: allowedMap.s3 !== false,
-      available: statusMap.s3,
-      disabled: allowedMap.s3 === false || statusMap.s3 === false,
+      ...s3,
     },
     {
       value: 'oss',
       label: t('kbSettings.storage.engineOss'),
       desc: t('kbSettings.storage.engineOssDesc'),
-      allowed: allowedMap.oss !== false,
-      available: statusMap.oss,
-      disabled: allowedMap.oss === false || statusMap.oss === false,
+      ...oss,
     },
     {
       value: 'ks3',
       label: t('kbSettings.storage.engineKs3'),
       desc: t('kbSettings.storage.engineKs3Desc'),
-      allowed: allowedMap.ks3 !== false,
-      available: statusMap.ks3,
-      disabled: allowedMap.ks3 === false || statusMap.ks3 === false,
+      ...ks3,
     },
     {
       value: 'obs',
       label: t('kbSettings.storage.engineObs'),
       desc: t('kbSettings.storage.engineObsDesc'),
-      allowed: allowedMap.obs !== false,
-      available: statusMap.obs,
-      disabled: allowedMap.obs === false || statusMap.obs === false,
+      ...obs,
     },
   ]
 })
