@@ -2985,6 +2985,10 @@ export default {
           label: "OpenRouter",
           description: "openai/gpt-5.2-chat, google/gemini-3-flash-preview, etc.",
         },
+        requesty: {
+          label: "Requesty",
+          description: "openai/gpt-4o-mini, anthropic/claude-sonnet-4-5, etc.",
+        },
         generic: {
           label: "自定义 (OpenAI兼容接口)",
           description: "Generic API endpoint (OpenAI-compatible)",
