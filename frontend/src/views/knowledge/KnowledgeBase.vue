@@ -528,6 +528,9 @@ const parseStatusOptions = computed(() => [
   { label: t('knowledgeBase.parseStatusProcessing'), value: 'processing' },
   { label: t('knowledgeBase.parseStatusCompleted'), value: 'completed' },
   { label: t('knowledgeBase.parseStatusFailed'), value: 'failed' },
+  { label: t('knowledgeBase.parseStatusCancelled'), value: 'cancelled' },
+  { label: t('knowledgeBase.parseStatusFinalizing'), value: 'finalizing' },
+  { label: t('knowledgeBase.parseStatusDraft'), value: 'draft' },
 ]);
 const selectedSource = ref('');
 // Source filter combines ingestion channels and the "manual"/"url" virtual
