@@ -34,13 +34,24 @@ func ResolveProcessConfig(kb *types.KnowledgeBase, overrides *types.KnowledgePro
 		eff.EnableMultimodel = *overrides.EnableMultimodel
 	}
 	if overrides.VLMConfig != nil {
+		base := eff.VLMConfig
 		eff.VLMConfig = *overrides.VLMConfig
+		if eff.VLMConfig.DescriptionLanguage == "" {
+			eff.VLMConfig.DescriptionLanguage = base.DescriptionLanguage
+		}
+		if eff.VLMConfig.CustomInstructions == "" {
+			eff.VLMConfig.CustomInstructions = base.CustomInstructions
+		}
 	}
 	if overrides.ASRConfig != nil {
 		eff.ASRConfig = *overrides.ASRConfig
 	}
 	if overrides.QuestionGenerationConfig != nil {
+		base := eff.QuestionGenerationConfig
 		eff.QuestionGenerationConfig = *overrides.QuestionGenerationConfig
+		if eff.QuestionGenerationConfig.CustomInstructions == "" {
+			eff.QuestionGenerationConfig.CustomInstructions = base.CustomInstructions
+		}
 	}
 	if overrides.GraphEnabled != nil {
 		eff.GraphEnabled = *overrides.GraphEnabled
@@ -189,6 +200,9 @@ func mergeChunkingConfig(base types.ChunkingConfig, override *types.ChunkingConf
 	if len(override.Languages) > 0 {
 		result.Languages = override.Languages
 	}
+	if override.TableMetadataInstructions != "" {
+		result.TableMetadataInstructions = override.TableMetadataInstructions
+	}
 	return result
 }
 
@@ -209,6 +223,9 @@ func mergeExtractConfig(base types.ExtractConfig, override *types.ExtractConfig)
 	}
 	if len(override.Relations) > 0 {
 		result.Relations = override.Relations
+	}
+	if override.CustomInstructions != "" {
+		result.CustomInstructions = override.CustomInstructions
 	}
 	return result
 }

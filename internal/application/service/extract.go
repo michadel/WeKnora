@@ -319,8 +319,9 @@ func (s *ChunkExtractService) Handle(ctx context.Context, t *asynq.Task) error {
 	}
 
 	template := &types.PromptTemplateStructured{
-		Description: s.template.Description,
-		Tags:        extractCfg.Tags,
+		Description: types.AppendCustomPromptInstructions(
+			s.template.Description, extractCfg.CustomInstructions, "graph_extraction"),
+		Tags: extractCfg.Tags,
 		Examples: []types.GraphData{
 			{
 				Text:     extractCfg.Text,
@@ -473,6 +474,7 @@ func (s *DataTableSummaryService) Handle(ctx context.Context, t *asynq.Task) err
 // extractionResources 封装提取过程所需的所有资源
 type extractionResources struct {
 	knowledge      *types.Knowledge
+	knowledgeBase  *types.KnowledgeBase
 	tenant         *types.Tenant
 	chatModel      chat.Chat
 	embeddingModel embedding.Embedder
@@ -543,6 +545,7 @@ func (s *DataTableSummaryService) prepareResources(ctx context.Context, payload 
 
 	return &extractionResources{
 		knowledge:      knowledge,
+		knowledgeBase:  kb,
 		tenant:         tenantInfo,
 		chatModel:      chatModel,
 		embeddingModel: embeddingModel,
@@ -621,14 +624,20 @@ func (s *DataTableSummaryService) processTableData(ctx context.Context, resource
 	sampleDesc := s.buildSampleDataDescription(sampleResult, 10)
 
 	// 使用AI生成表格摘要和列描述
-	tableDescription, err := s.generateTableDescription(ctx, resources.chatModel, tableSchema.TableName, schemaDesc, sampleDesc)
+	customInstructions := ""
+	if resources.knowledgeBase != nil {
+		customInstructions = resources.knowledgeBase.ChunkingConfig.TableMetadataInstructions
+	}
+	tableDescription, err := s.generateTableDescription(ctx, resources.chatModel, tableSchema.TableName,
+		schemaDesc, sampleDesc, customInstructions)
 	if err != nil {
 		logger.Errorf(ctx, "failed to generate table description: %v", err)
 		return nil, err
 	}
 	logger.Debugf(ctx, "table describe of knowledge %s: %s", resources.knowledge.ID, tableDescription)
 
-	columnDescription, err := s.generateColumnDescriptions(ctx, resources.chatModel, tableSchema.TableName, schemaDesc, sampleDesc)
+	columnDescription, err := s.generateColumnDescriptions(ctx, resources.chatModel, tableSchema.TableName,
+		schemaDesc, sampleDesc, customInstructions)
 	if err != nil {
 		logger.Errorf(ctx, "failed to generate column descriptions: %v", err)
 		return nil, err
@@ -771,8 +780,11 @@ func (s *DataTableSummaryService) cleanupOnFailure(ctx context.Context, resource
 }
 
 // generateTableDescription generates a summary description for the entire table
-func (s *DataTableSummaryService) generateTableDescription(ctx context.Context, chatModel chat.Chat, tableName, schemaDesc, sampleDesc string) (string, error) {
+func (s *DataTableSummaryService) generateTableDescription(ctx context.Context, chatModel chat.Chat,
+	tableName, schemaDesc, sampleDesc, customInstructions string,
+) (string, error) {
 	prompt := fmt.Sprintf(tableDescriptionPromptTemplate, tableName, schemaDesc, sampleDesc)
+	prompt = types.AppendCustomPromptInstructions(prompt, customInstructions, "table_metadata")
 	// logger.Debugf(ctx, "generateTableDescription prompt: %s", prompt)
 
 	thinking := false
@@ -791,9 +803,12 @@ func (s *DataTableSummaryService) generateTableDescription(ctx context.Context, 
 }
 
 // generateColumnDescriptions generates descriptions for each column in batch
-func (s *DataTableSummaryService) generateColumnDescriptions(ctx context.Context, chatModel chat.Chat, tableName, schemaDesc, sampleDesc string) (string, error) {
+func (s *DataTableSummaryService) generateColumnDescriptions(ctx context.Context, chatModel chat.Chat,
+	tableName, schemaDesc, sampleDesc, customInstructions string,
+) (string, error) {
 	// Build batch prompt for all columns
 	prompt := fmt.Sprintf(columnDescriptionsPromptTemplate, tableName, schemaDesc, sampleDesc)
+	prompt = types.AppendCustomPromptInstructions(prompt, customInstructions, "table_metadata")
 	// logger.Debugf(ctx, "generateColumnDescriptions prompt: %s", prompt)
 
 	// Call LLM once for all columns

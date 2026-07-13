@@ -199,6 +199,34 @@ func TestResolveProcessConfig_ExtractConfigFieldMerge(t *testing.T) {
 	require.Equal(t, []string{"override-tag"}, eff.ExtractConfig.Tags)
 }
 
+func TestResolveProcessConfig_PreservesKnowledgeBasePromptInstructions(t *testing.T) {
+	t.Parallel()
+
+	kb := &types.KnowledgeBase{
+		ChunkingConfig: types.ChunkingConfig{TableMetadataInstructions: "table context"},
+		VLMConfig: types.VLMConfig{
+			Enabled: true, ModelID: "vlm-1", DescriptionLanguage: "English", CustomInstructions: "read labels",
+		},
+		QuestionGenerationConfig: &types.QuestionGenerationConfig{
+			Enabled: true, QuestionCount: 3, CustomInstructions: "customer questions",
+		},
+		ExtractConfig: &types.ExtractConfig{Enabled: true, CustomInstructions: "contract entities"},
+	}
+	overrides := &types.KnowledgeProcessOverrides{
+		ChunkingConfig:           &types.ChunkingConfig{ChunkSize: 256},
+		VLMConfig:                &types.VLMConfig{Enabled: true, ModelID: "vlm-2"},
+		QuestionGenerationConfig: &types.QuestionGenerationConfig{Enabled: true, QuestionCount: 5},
+		ExtractConfig:            &types.ExtractConfig{Enabled: true},
+	}
+
+	eff := ResolveProcessConfig(kb, overrides)
+	require.Equal(t, "table context", eff.ChunkingConfig.TableMetadataInstructions)
+	require.Equal(t, "English", eff.VLMConfig.DescriptionLanguage)
+	require.Equal(t, "read labels", eff.VLMConfig.CustomInstructions)
+	require.Equal(t, "customer questions", eff.QuestionGenerationConfig.CustomInstructions)
+	require.Equal(t, "contract entities", eff.ExtractConfig.CustomInstructions)
+}
+
 func TestValidateProcessOverrides_NilOverrides(t *testing.T) {
 	t.Parallel()
 
