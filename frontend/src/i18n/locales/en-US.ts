@@ -5840,8 +5840,9 @@ export default {
     },
     im: {
       title: 'IM Integration',
-      description: 'Connect agent to instant messaging platforms like WeCom, Feishu, Slack, Telegram, DingTalk, Mattermost, WeChat and QQBot',
+      description: 'Connect agent to instant messaging platforms like WeCom, Feishu, Lark, Slack, Telegram, DingTalk, Mattermost, WeChat and QQBot',
       feishu: 'Feishu',
+      lark: 'Lark',
       slack: 'Slack',
       telegram: 'Telegram',
       dingtalk: 'DingTalk',
@@ -5868,6 +5869,7 @@ export default {
       docLink: 'Integration Guide',
       wecomConsole: 'WeCom Admin Console',
       feishuConsole: 'Feishu Open Platform',
+      larkConsole: 'Lark Open Platform',
       slackConsole: 'Slack API Console',
       telegramConsole: 'Telegram BotFather',
       dingtalkConsole: 'DingTalk Open Platform',
@@ -6162,12 +6164,14 @@ export default {
     },
     connector: {
       feishu: 'Feishu',
+      lark: 'Lark',
       notion: 'Notion',
       yuque: 'Yuque',
       rss: 'RSS / Atom Feed',
     },
     connectorDesc: {
       feishu: 'Sync documents, spreadsheets and files from Feishu Wiki',
+      lark: 'Sync documents, spreadsheets and files from Lark Wiki (Feishu international)',
       notion: 'Sync pages and databases from Notion',
       yuque: 'Sync documents from Yuque knowledge bases',
       rss: 'Sync articles from RSS / Atom feeds',
