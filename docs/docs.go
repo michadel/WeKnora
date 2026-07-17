@@ -19313,7 +19313,8 @@ const docTemplate = `{
                 "ollama",
                 "baidu",
                 "searxng",
-                "keenable"
+                "keenable",
+                "zhipu"
             ],
             "x-enum-varnames": [
                 "WebSearchProviderTypeBing",
@@ -19323,7 +19324,8 @@ const docTemplate = `{
                 "WebSearchProviderTypeOllama",
                 "WebSearchProviderTypeBaidu",
                 "WebSearchProviderTypeSearxng",
-                "WebSearchProviderTypeKeenable"
+                "WebSearchProviderTypeKeenable",
+                "WebSearchProviderTypeZhipu"
             ]
         },
         "github_com_Tencent_WeKnora_internal_types.WikiConfig": {
