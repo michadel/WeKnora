@@ -69,20 +69,56 @@ export function embedVisitorStorageKey(channelId: string): string {
   return `${EMBED_VISITOR_STORAGE_PREFIX}${channelId}`
 }
 
+/**
+ * 生成符合 UUID v4 格式的随机 ID。
+ * 优先使用 crypto.randomUUID()，在不支持的浏览器中回退到 crypto.getRandomValues()，
+ * 最终兜底使用 Math.random()。
+ */
+export function generateUUID(): string {
+  // 优先使用原生 API（HTTPS 环境下可用）
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  // 回退：使用 crypto.getRandomValues()
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const buf = new Uint8Array(16)
+    crypto.getRandomValues(buf)
+    // 设置 UUID v4 标志位
+    buf[6] = (buf[6] & 0x0f) | 0x40
+    buf[8] = (buf[8] & 0x3f) | 0x80
+    const hex = Array.from(buf, (b) => b.toString(16).padStart(2, '0'))
+    return [
+      hex[0], hex[1], hex[2], hex[3], '-',
+      hex[4], hex[5], '-',
+      hex[6], hex[7], '-',
+      hex[8], hex[9], '-',
+      hex[10], hex[11], hex[12], hex[13], hex[14], hex[15],
+    ].join('')
+  }
+
+  // 最终兜底：Math.random()（随机性较弱，仅保证格式正确）
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
 /** Stable anonymous id for this browser on the given channel. */
 export function getOrCreateEmbedVisitorId(channelId: string): string {
   if (typeof localStorage === 'undefined' || !channelId) {
-    return crypto.randomUUID()
+    return generateUUID()
   }
   const key = embedVisitorStorageKey(channelId)
   try {
     const existing = localStorage.getItem(key)?.trim()
     if (existing) return existing
-    const id = crypto.randomUUID()
+    const id = generateUUID()
     localStorage.setItem(key, id)
     return id
   } catch {
-    return crypto.randomUUID()
+    return generateUUID()
   }
 }
 
