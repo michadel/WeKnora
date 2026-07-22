@@ -18399,6 +18399,7 @@ const docTemplate = `{
                     }
                 },
                 "query_text": {
+                    "description": "QueryText is required unless query_embedding is provided, keyword matching is disabled,\nand vector matching remains enabled.",
                     "type": "string"
                 },
                 "scope_tag_ids": {
