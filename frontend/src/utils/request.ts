@@ -4,6 +4,13 @@ import { generateRandomString, MAX_FILE_SIZE_MB, MAX_SKILL_BUNDLE_SIZE_MB } from
 import i18n from '@/i18n'
 import { getApiBaseUrl } from './api-base';
 import { isSkillBundleUploadUrl } from './uploadLimit';
+import {
+  forceReloginRedirect,
+  isEmbedPage,
+  refreshAccessTokenShared,
+} from './authRefresh';
+
+export { forceReloginRedirect, refreshAccessTokenShared };
 
 const t = (key: string) => i18n.global.t(key)
 
@@ -102,10 +109,6 @@ instance.interceptors.request.use(
   }
 );
 
-// Token刷新标志，防止多个请求同时刷新token
-let isRefreshing = false;
-let failedQueue: Array<{ resolve: Function; reject: Function }> = [];
-
 // Share-link endpoints (/auth/invitations/lookup, /auth/register-by-invite)
 // are reachable by anonymous users opening an invite link. A 401 from these
 // must surface to the page (e.g. expired token), not trigger the
@@ -116,32 +119,6 @@ const PUBLIC_AUTH_PATHS = ['/auth/auto-setup', '/auth/login', '/auth/register', 
 function isPublicAuthRequest(url?: string): boolean {
   if (!url) return false;
   return PUBLIC_AUTH_PATHS.some(p => url.includes(p));
-}
-
-// 处理队列中的请求
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(token);
-    }
-  });
-  
-  failedQueue = [];
-};
-
-function isEmbedPage(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.location.pathname.startsWith('/embed/');
-}
-
-function redirectToLogin() {
-  if (typeof window === 'undefined') return;
-  if (window.location.pathname === '/login') return;
-  // Embed 渠道用 Embed token 鉴权，匿名访问不应被踢到登录页
-  if (isEmbedPage()) return;
-  window.location.href = '/login';
 }
 
 instance.interceptors.response.use(
@@ -181,70 +158,19 @@ instance.interceptors.response.use(
 
     // 如果是401错误且不是刷新token的请求，尝试刷新token
     if (error.response.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh')) {
-      if (isRefreshing) {
-        // 如果正在刷新token，将请求加入队列
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        }).then(token => {
-          originalRequest.headers['Authorization'] = 'Bearer ' + token;
-          return instance(originalRequest);
-        }).catch(err => {
-          return Promise.reject(err);
-        });
-      }
-      
       originalRequest._retry = true;
-      isRefreshing = true;
-      
-      const refreshToken = localStorage.getItem('weknora_refresh_token');
-      
-      if (refreshToken) {
-        try {
-          // 动态导入refresh token API
-          const { refreshToken: refreshTokenAPI } = await import('../api/auth/index');
-          const response = await refreshTokenAPI(refreshToken);
-          
-          if (response.success && response.data) {
-            const { token, refreshToken: newRefreshToken } = response.data;
-            
-            // 更新localStorage中的token
-            localStorage.setItem('weknora_token', token);
-            localStorage.setItem('weknora_refresh_token', newRefreshToken);
-            
-            // 更新请求头
-            originalRequest.headers['Authorization'] = 'Bearer ' + token;
-            
-            // 处理队列中的请求
-            processQueue(null, token);
-            
-            return instance(originalRequest);
-          } else {
-            throw new Error(response.message || t('error.tokenRefreshFailed'));
-          }
-        } catch (refreshError) {
-          // 刷新失败，清除所有token并跳转到登录页
-          localStorage.removeItem('weknora_token');
-          localStorage.removeItem('weknora_refresh_token');
-          localStorage.removeItem('weknora_user');
-          localStorage.removeItem('weknora_tenant');
-          
-          processQueue(refreshError, null);
-          
-          redirectToLogin();
-          
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
-      } else {
-        // 没有refresh token，直接跳转到登录页
-        localStorage.removeItem('weknora_token');
-        localStorage.removeItem('weknora_user');
-        localStorage.removeItem('weknora_tenant');
-        
-        redirectToLogin();
-        
-        return Promise.reject({ message: t('error.pleaseRelogin') });
+      try {
+        const token = await refreshAccessTokenShared({
+          messages: {
+            pleaseRelogin: t('error.pleaseRelogin'),
+            tokenRefreshFailed: t('error.tokenRefreshFailed'),
+          },
+        });
+        originalRequest.headers['Authorization'] = 'Bearer ' + token;
+        return instance(originalRequest);
+      } catch (refreshError) {
+        // refreshAccessTokenShared already cleared credentials and redirected.
+        return Promise.reject(refreshError);
       }
     }
     
