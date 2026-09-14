@@ -6411,6 +6411,7 @@ export default {
       lark_drive: 'Lark Drive',
       notion: 'Notion',
       yuque: 'Yuque',
+      dingtalk: 'DingTalk Docs',
       rss: 'RSS / Atom Feed',
       ima: 'Tencent IMA',
       gitlab: 'GitLab'
@@ -6422,6 +6423,7 @@ export default {
       lark_drive: 'Sync documents, spreadsheets and files from a Lark Drive folder (Feishu international)',
       notion: 'Sync pages and databases from Notion',
       yuque: 'Sync documents from Yuque knowledge bases',
+      dingtalk: 'Sync online documents from DingTalk knowledge bases',
       rss: 'Sync articles from RSS / Atom feeds',
       ima: 'Sync documents, notes and files from Tencent IMA knowledge bases (AI sessions and video parses are not supported)',
       gitlab: 'Sync files from GitLab projects'
@@ -6442,6 +6444,10 @@ export default {
     field: {
       appId: 'App ID',
       appSecret: 'App Secret',
+      clientId: 'Client ID',
+      clientSecret: 'Client Secret',
+      operatorId: 'Operator Union ID',
+      operatorIdHint: 'Reads knowledge bases with this user’s permissions. Obtain it from the DingTalk user details API.',
       integrationToken: 'Integration Token',
       apiToken: 'API Token',
       imaClientId: 'IMA ClientID',
@@ -6489,6 +6495,14 @@ export default {
     prereqStep3Brief_lark_drive: 'Configure app permissions',
     prereqStep3Desc_lark_drive: 'Enable drive:drive:readonly, drive:export:readonly, docx:document:readonly permissions',
     prereqOpenConsole_yuque: 'Open Yuque Token settings',
+    prereqBarText_dingtalk: 'First time? Click to see the DingTalk app setup guide',
+    prereqStep1Brief_dingtalk: 'Create an internal enterprise app',
+    prereqStep1Desc_dingtalk: 'Create an internal app in DingTalk Open Platform and copy its Client ID and Client Secret.',
+    prereqStep2Brief_dingtalk: 'Grant knowledge base read permissions',
+    prereqStep2Desc_dingtalk: 'Grant Wiki.Workspace.Read, Wiki.Node.Read, and Storage.File.Read.',
+    prereqStep3Brief_dingtalk: 'Enter the operator Union ID',
+    prereqStep3Desc_dingtalk: 'Enter the Union ID of a DingTalk user who can access the target knowledge bases.',
+    prereqOpenConsole_dingtalk: 'Open DingTalk Developer Console',
     prereqBarText_ima: 'First time? Click to see the Tencent IMA OpenAPI setup guide',
     prereqStep1Brief_ima: 'Enable IMA agent OpenAPI access',
     prereqStep1Desc_ima: 'Sign in to https://ima.qq.com/agent-interface and apply for OpenAPI access',
@@ -6529,6 +6543,8 @@ export default {
     hoursAgo: '{n}h ago',
     daysAgo: '{n}d ago',
     syncError: {
+      dingtalk_document_failed: 'DingTalk document could not be read; check access and retry the sync.',
+      dingtalk_resource_failed: 'DingTalk resource is unavailable; check access and the saved selection, then retry.',
       deletion_lookup_failed: 'Failed to look up the item before deletion; see server logs',
       deletion_failed: 'Deletion failed; see server logs',
       ingest_failed: 'Ingest failed; see server logs'
