@@ -2786,8 +2786,9 @@ func (s *Service) handleMessageStream(ctx context.Context, msg *IncomingMessage,
 
 	// Run QA async
 	go func() {
-		// AgentQA runs to completion, but KnowledgeQA starts an asynchronous
-		// answer stream. Only the agent's return is a fallback completion signal.
+		// AgentQA returns after all synchronous events, including errors emitted
+		// after EventAgentComplete. KnowledgeQA starts an asynchronous stream,
+		// so its return must not end the reply.
 		if useAgent {
 			defer closeDone()
 			defer closeComplete()
@@ -3069,6 +3070,12 @@ func (s *Service) runQA(ctx context.Context, session *types.Session, query strin
 
 	// Run QA async
 	go func() {
+		// Match the streaming path: a returned AgentQA cannot produce more
+		// events, while KnowledgeQA may still be consuming its answer stream.
+		if useAgent {
+			defer closeDone()
+			defer closeComplete()
+		}
 		var err error
 		req := buildIMQARequest(session, query, assistantMsg.ID, userMsg.ID, customAgent, kbIDs, quote, attachments)
 		req.ImageURLs = imageURLs
