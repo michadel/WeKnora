@@ -2404,6 +2404,12 @@ export default {
     me: 'Me',
     confirm: 'Confirm',
     cancel: 'Cancel',
+    unsavedChanges: {
+      title: 'Unsaved changes',
+      body: 'Your changes will be lost if you close now. Close anyway?',
+      discard: 'Discard changes',
+      keepEditing: 'Keep editing',
+    },
     save: 'Save',
     delete: 'Delete',
     edit: 'Edit',
@@ -3243,6 +3249,9 @@ export default {
       save: 'Save Configuration',
       saveAndClose: 'Save and Close',
     },
+    footer: {
+      instantEffect: 'Changes on this page take effect immediately; no save needed',
+    },
     postCreateHint: {
       title: 'Created successfully',
       footer: 'Keep adjusting settings, configure sharing and data sources, then click "Save and Close".',
@@ -3341,6 +3350,7 @@ export default {
       batchDisable: 'Disable selected',
       batchDelete: 'Delete selected',
       confirmBatchDelete: 'Delete the selected {count} FAQ entries? This action cannot be undone.',
+      confirmDelete: 'Delete this FAQ entry? This cannot be undone.',
       batchDeleteSuccess: 'Deleted {count} FAQ entries'
     },
     faqImport: {

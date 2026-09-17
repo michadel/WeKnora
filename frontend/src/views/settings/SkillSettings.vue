@@ -1170,12 +1170,16 @@ onUnmounted(() => {
 </script>
 
 <style lang="less" scoped>
+@import (reference) '@/components/css/provider-card.less';
+
+@import (reference) '@/components/css/settings-section.less';
+
 .skill-settings {
   width: 100%;
 }
 
 .section-header {
-  margin-bottom: 28px;
+  .settings-section-header();
 
   &__title-row {
     display: flex;
@@ -1184,29 +1188,15 @@ onUnmounted(() => {
     margin-bottom: 8px;
   }
 
-  h2 {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--td-text-color-primary);
-    margin: 0;
-  }
-
   &__help {
     color: var(--td-text-color-placeholder);
-    font-size: 16px;
+    font-size: var(--app-text-xl);
     cursor: help;
-    transition: color 0.15s ease;
+    transition: color var(--app-motion-fast) ease;
 
     &:hover {
       color: var(--td-text-color-secondary);
     }
-  }
-
-  .section-description {
-    font-size: 14px;
-    color: var(--td-text-color-secondary);
-    margin: 0;
-    line-height: 1.6;
   }
 }
 
@@ -1221,10 +1211,10 @@ onUnmounted(() => {
 
 :global(.skill-install-panel-overlay .t-popup__content) {
   padding: 0 !important;
-  border-radius: 6px !important;
+  border-radius: var(--app-radius-sm) !important;
   border: 1px solid var(--td-component-stroke) !important;
   background: var(--td-bg-color-container) !important;
-  box-shadow: var(--td-shadow-2, 0 3px 14px 2px rgba(0, 0, 0, 0.05)) !important;
+  box-shadow: var(--td-shadow-2) !important;
 }
 
 .loading-container {
@@ -1237,7 +1227,7 @@ onUnmounted(() => {
   text-align: center;
 
   :deep(.t-empty__description) {
-    font-size: 14px;
+    font-size: var(--app-text-base);
     color: var(--td-text-color-placeholder);
     margin-bottom: 16px;
   }
@@ -1245,7 +1235,7 @@ onUnmounted(() => {
 
 .empty-hint {
   margin: 0 0 16px;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   color: var(--td-text-color-placeholder);
 }
 
@@ -1269,7 +1259,7 @@ onUnmounted(() => {
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--td-component-stroke);
-  border-radius: 10px;
+  border-radius: var(--app-radius-lg);
   background: var(--td-bg-color-container);
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
   min-width: 0;
@@ -1277,7 +1267,7 @@ onUnmounted(() => {
 
   &--focused {
     border-color: var(--td-brand-color);
-    box-shadow: 0 0 0 2px var(--td-brand-color-focus, rgba(0, 168, 112, 0.18));
+    box-shadow: 0 0 0 2px var(--td-brand-color-focus);
   }
 
   &--installed .skill-card__badge {
@@ -1319,14 +1309,14 @@ onUnmounted(() => {
       justify-content: center;
       width: 32px;
       height: 32px;
-      border-radius: 8px;
+      border-radius: var(--app-radius-md);
       background: var(--td-bg-color-secondarycontainer);
       color: var(--td-text-color-secondary);
-      font-size: 18px;
+      font-size: var(--app-text-2xl);
     }
 
     &__label {
-      font-size: 13px;
+      font-size: var(--app-text-md);
       font-weight: 500;
       line-height: 1.4;
     }
@@ -1342,15 +1332,8 @@ onUnmounted(() => {
 }
 
 .skill-card__badge {
-  flex-shrink: 0;
-  width: 26px;
-  height: 26px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--td-bg-color-secondarycontainer);
-  color: var(--td-text-color-secondary);
+  .provider-card-badge(26px, 7px);
+  font-size: var(--app-text-md);
 
   :deep(.t-icon) {
     display: block;
@@ -1386,7 +1369,7 @@ onUnmounted(() => {
   flex: 0 1 auto;
   min-width: 0;
   margin: 0;
-  font-size: 14px;
+  font-size: var(--app-text-base);
   font-weight: 600;
   line-height: 20px;
   color: var(--td-text-color-primary);
@@ -1412,7 +1395,7 @@ onUnmounted(() => {
   margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   background: none;
   color: var(--td-text-color-placeholder);
   cursor: pointer;
@@ -1440,7 +1423,7 @@ onUnmounted(() => {
 
 .skill-card__type {
   flex-shrink: 0;
-  font-size: 11px;
+  font-size: var(--app-text-xs);
   font-weight: 500;
   line-height: 18px;
   color: var(--td-text-color-placeholder);
@@ -1453,7 +1436,7 @@ onUnmounted(() => {
   line-clamp: 2;
   margin: 0;
   overflow: hidden;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 1.5;
   color: var(--td-text-color-secondary);
   overflow-wrap: anywhere;
@@ -1467,7 +1450,7 @@ onUnmounted(() => {
 }
 
 .skill-card__installs-label {
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 18px;
   color: var(--td-text-color-placeholder);
 }
@@ -1481,12 +1464,12 @@ onUnmounted(() => {
   margin: 0;
   padding: 2px 6px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   background: var(--td-bg-color-secondarycontainer);
   color: var(--td-text-color-secondary);
   cursor: pointer;
   font: inherit;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 18px;
   text-align: left;
 
@@ -1519,7 +1502,7 @@ onUnmounted(() => {
   }
 
   &--installed .skill-card__entry-status {
-    color: var(--td-success-color, var(--td-brand-color));
+    color: var(--td-success-color);
   }
 
   &.skill-card__entry--stale {
@@ -1562,7 +1545,7 @@ onUnmounted(() => {
 }
 
 .skill-card__entry--ready .skill-card__entry-status {
-  color: var(--td-success-color, var(--td-brand-color));
+  color: var(--td-success-color);
 }
 
 .skill-card__chip-go {
@@ -1594,7 +1577,7 @@ onUnmounted(() => {
 .skill-install-panel__group {
   margin: 0;
   padding: 6px 12px 4px;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 20px;
   color: var(--td-text-color-placeholder);
 }
@@ -1613,7 +1596,7 @@ onUnmounted(() => {
   color: var(--td-text-color-primary);
   cursor: pointer;
   font: inherit;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   line-height: 22px;
   text-align: left;
 
@@ -1680,7 +1663,7 @@ onUnmounted(() => {
 
 .installer-model-hint {
   margin: 0;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 1.5;
   color: var(--td-text-color-secondary);
 }
@@ -1702,7 +1685,7 @@ onUnmounted(() => {
   gap: 8px;
   min-width: 0;
   color: var(--td-text-color-placeholder);
-  transition: color 0.15s ease;
+  transition: color var(--app-motion-fast) ease;
 
   &:not(:last-child) {
     flex: 1;
@@ -1731,7 +1714,7 @@ onUnmounted(() => {
     &:focus-visible {
       outline: 2px solid var(--td-brand-color);
       outline-offset: 2px;
-      border-radius: 4px;
+      border-radius: var(--app-radius-xs);
     }
   }
 }
@@ -1745,7 +1728,7 @@ onUnmounted(() => {
   flex-shrink: 0;
   border: 1px solid currentColor;
   border-radius: 50%;
-  font-size: 11px;
+  font-size: var(--app-text-xs);
   font-weight: 600;
   line-height: 1;
 
@@ -1764,7 +1747,7 @@ onUnmounted(() => {
 
 .skill-add-step__title {
   overflow: hidden;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 500;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1798,7 +1781,7 @@ onUnmounted(() => {
     align-items: center;
     padding: 10px 12px;
     border: 1px solid var(--td-component-stroke);
-    border-radius: 10px;
+    border-radius: var(--app-radius-lg);
     background: var(--td-bg-color-container);
     cursor: pointer;
     box-sizing: border-box;
@@ -1845,7 +1828,7 @@ onUnmounted(() => {
   box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid var(--td-component-stroke);
-  border-radius: 10px;
+  border-radius: var(--app-radius-lg);
   background: var(--td-bg-color-container);
 
   .sandbox-pick__main {
@@ -1878,7 +1861,7 @@ onUnmounted(() => {
 }
 
 .sandbox-pick__name {
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 500;
   color: var(--td-text-color-primary);
   line-height: 1.3;
@@ -1888,7 +1871,7 @@ onUnmounted(() => {
 }
 
 .sandbox-pick__meta {
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   color: var(--td-text-color-secondary);
   line-height: 1.3;
   overflow: hidden;
@@ -1900,7 +1883,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   font-weight: 500;
   line-height: 1;
   color: var(--td-brand-color);
@@ -1920,9 +1903,9 @@ onUnmounted(() => {
 
 .file-upload-area {
   border: 1px dashed var(--td-component-stroke);
-  border-radius: 10px;
+  border-radius: var(--app-radius-lg);
   cursor: pointer;
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition: border-color var(--app-motion-fast) ease, background var(--app-motion-fast) ease;
 
   &:hover:not(.is-disabled) {
     border-color: var(--td-brand-color);
@@ -1965,18 +1948,18 @@ onUnmounted(() => {
 }
 
 .upload-primary-text {
-  font-size: 15px;
+  font-size: var(--app-text-lg);
   font-weight: 500;
   color: var(--td-text-color-primary);
 }
 
 .upload-secondary-text {
-  font-size: 13px;
+  font-size: var(--app-text-md);
   color: var(--td-text-color-secondary);
 }
 
 .upload-file-name {
-  font-size: 14px;
+  font-size: var(--app-text-base);
   font-weight: 500;
   color: var(--td-brand-color);
 }

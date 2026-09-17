@@ -4142,6 +4142,7 @@ export default {
       batchDisable: '일괄 비활성화',
       batchDelete: '일괄 삭제',
       confirmBatchDelete: '선택한 FAQ 항목 {count}개를 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.',
+      confirmDelete: '이 FAQ 항목을 삭제하시겠습니까? 삭제 후 복구할 수 없습니다.',
       batchDeleteSuccess: 'FAQ 항목 {count}개를 삭제했습니다',
       modes: {
         questionOnly: '표준 질문/유사 질문만',
@@ -4181,6 +4182,9 @@ export default {
       create: '지식베이스 생성',
       save: '설정 저장',
       saveAndClose: '저장 후 닫기',
+    },
+    footer: {
+      instantEffect: '이 페이지의 변경 사항은 즉시 적용되며 저장할 필요가 없습니다',
     },
     postCreateHint: {
       title: '생성 완료',
@@ -4971,6 +4975,12 @@ export default {
     me: '나',
     confirm: '확인',
     cancel: '취소',
+    unsavedChanges: {
+      title: '저장되지 않은 변경 사항',
+      body: '지금 닫으면 변경 사항이 사라집니다. 닫으시겠습니까?',
+      discard: '변경 사항 버리기',
+      keepEditing: '계속 편집',
+    },
     save: '저장',
     delete: '삭제',
     edit: '편집',

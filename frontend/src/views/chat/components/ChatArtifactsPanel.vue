@@ -342,7 +342,7 @@ async function handleDownload(item: SessionArtifactItem) {
 .artifact-panel-header-title {
   min-width: 0;
   flex: 1;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 600;
   line-height: 1.4;
   color: var(--td-text-color-primary);
@@ -368,7 +368,7 @@ async function handleDownload(item: SessionArtifactItem) {
   gap: 8px;
   padding: 32px 16px;
   color: var(--td-text-color-placeholder);
-  font-size: 13px;
+  font-size: var(--app-text-md);
   text-align: center;
 }
 
@@ -377,19 +377,13 @@ async function handleDownload(item: SessionArtifactItem) {
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   color: var(--td-text-color-secondary);
   border-bottom: 1px solid var(--td-component-stroke);
 }
 
 .artifact-panel-banner-spin {
-  animation: artifact-panel-spin 0.8s linear infinite;
-}
-
-@keyframes artifact-panel-spin {
-  to {
-    transform: rotate(360deg);
-  }
+  animation: wk-spin 0.8s linear infinite;
 }
 
 .artifact-list {
@@ -406,7 +400,7 @@ async function handleDownload(item: SessionArtifactItem) {
   align-items: center;
   gap: 12px;
   padding: 12px 8px;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
 
   &.is-previewable {
     cursor: pointer;
@@ -431,7 +425,7 @@ async function handleDownload(item: SessionArtifactItem) {
   align-self: flex-start;
   gap: 2px;
   padding: 3px;
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   background: var(--td-bg-color-secondarycontainer);
 
   button {
@@ -444,7 +438,7 @@ async function handleDownload(item: SessionArtifactItem) {
     background: transparent;
     color: var(--td-text-color-secondary);
     font: inherit;
-    font-size: 12px;
+    font-size: var(--app-text-sm);
     cursor: pointer;
 
     &[aria-pressed='true'] {
@@ -460,7 +454,7 @@ async function handleDownload(item: SessionArtifactItem) {
 
     span {
       color: var(--td-text-color-placeholder);
-      font-size: 11px;
+      font-size: var(--app-text-xs);
       font-variant-numeric: tabular-nums;
     }
   }
@@ -483,7 +477,7 @@ async function handleDownload(item: SessionArtifactItem) {
   gap: 12px;
   padding: 0;
   border: 0;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -498,7 +492,7 @@ async function handleDownload(item: SessionArtifactItem) {
 
 .artifact-name {
   display: block;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1.35;
@@ -510,7 +504,7 @@ async function handleDownload(item: SessionArtifactItem) {
 
 .artifact-meta {
   margin-top: 2px;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 1.3;
   color: var(--td-text-color-placeholder);
   display: flex;
@@ -528,7 +522,7 @@ async function handleDownload(item: SessionArtifactItem) {
   height: 30px;
   border-radius: 7px;
   color: var(--td-text-color-secondary);
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--app-motion-fast) ease, color var(--app-motion-fast) ease;
 
   &:not(.t-is-disabled):not(.t-is-loading):hover {
     background: color-mix(in srgb, var(--td-text-color-primary) 10%, var(--td-bg-color-container));

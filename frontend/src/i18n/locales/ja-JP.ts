@@ -2404,6 +2404,12 @@ export default {
     me: '自分',
     confirm: '確認',
     cancel: 'キャンセル',
+    unsavedChanges: {
+      title: '未保存の変更があります',
+      body: '閉じると現在の変更は失われます。閉じますか？',
+      discard: '変更を破棄',
+      keepEditing: '編集を続ける',
+    },
     save: '保存',
     delete: '削除',
     edit: '編集',
@@ -3243,6 +3249,9 @@ export default {
       save: '設定を保存',
       saveAndClose: '保存して閉じる',
     },
+    footer: {
+      instantEffect: 'このページの変更は即時に反映されます。保存は不要です',
+    },
     postCreateHint: {
       title: '作成しました',
       footer: '設定の調整を続け、共有やデータソースを設定してから「保存して閉じる」をクリックしてください。',
@@ -3341,6 +3350,7 @@ export default {
       batchDisable: '選択項目を無効化',
       batchDelete: '選択項目を削除',
       confirmBatchDelete: '選択した{count}件のFAQエントリを削除しますか？この操作は取り消せません。',
+      confirmDelete: 'この FAQ エントリを削除しますか？この操作は元に戻せません。',
       batchDeleteSuccess: '{count}件のFAQエントリを削除しました'
     },
     faqImport: {

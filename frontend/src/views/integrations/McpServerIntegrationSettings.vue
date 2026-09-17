@@ -568,7 +568,7 @@ onMounted(() => {
 .form-label {
   display: block;
   margin-bottom: 6px;
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 500;
   color: var(--td-text-color-primary);
   line-height: 1.4;
@@ -585,7 +585,7 @@ onMounted(() => {
 
 .form-desc {
   margin: 4px 0 0;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 1.45;
   color: var(--td-text-color-placeholder);
 
@@ -618,7 +618,7 @@ onMounted(() => {
 
 .tool-group {
   border: 1px solid var(--td-component-stroke);
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   padding: 10px 12px;
 }
 
@@ -630,7 +630,7 @@ onMounted(() => {
 }
 
 .tool-group__name {
-  font-size: 13px;
+  font-size: var(--app-text-md);
   font-weight: 600;
   color: var(--td-text-color-primary);
 }
@@ -655,26 +655,26 @@ onMounted(() => {
 
 .tool-item__code {
   margin-left: 6px;
-  font-size: 11px;
+  font-size: var(--app-text-xs);
   color: var(--td-text-color-placeholder);
   background: var(--td-bg-color-secondarycontainer);
   padding: 1px 5px;
-  border-radius: 4px;
+  border-radius: var(--app-radius-xs);
 }
 
 .code-toolbar {
   position: relative;
   margin: 6px 0 10px;
   border: 1px solid var(--td-component-stroke);
-  border-radius: 8px;
+  border-radius: var(--app-radius-md);
   background: var(--td-bg-color-secondarycontainer);
 }
 
 .code-toolbar__code {
   margin: 0;
   padding: 10px 40px 10px 12px;
-  font-family: var(--td-font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 12px;
+  font-family: var(--td-font-family-mono);
+  font-size: var(--app-text-sm);
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-all;
@@ -714,7 +714,7 @@ onMounted(() => {
   gap: 6px;
   flex: 1;
   min-width: 0;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   color: var(--td-text-color-placeholder);
   padding: 0;
   border: none;
@@ -757,7 +757,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: var(--app-text-xs);
   font-weight: 600;
   border: 1px solid var(--td-component-stroke);
   color: var(--td-text-color-placeholder);
@@ -777,7 +777,7 @@ onMounted(() => {
 }
 
 .im-step-check {
-  font-size: 12px;
+  font-size: var(--app-text-sm);
 }
 
 .im-step-body {

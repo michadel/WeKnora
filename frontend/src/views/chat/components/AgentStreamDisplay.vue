@@ -3373,7 +3373,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
     border-left: 0;
     overflow: visible;
     position: relative;
-    transition: border-color 0.2s ease;
+    transition: border-color var(--app-motion-base) ease;
     box-shadow: none;
 
     >* {
@@ -3409,7 +3409,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
   .tool-summary {
     padding: 6px 12px;
-    font-size: 12px;
+    font-size: var(--app-text-sm);
     color: var(--td-text-color-primary);
     background: var(--td-bg-color-container);
     border-top: 1px solid var(--td-component-stroke);
@@ -3439,7 +3439,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
         background: var(--td-bg-color-secondarycontainer);
         padding: 2px 5px;
         border-radius: 3px;
-        font-size: 11px;
+        font-size: var(--app-text-xs);
         color: var(--td-brand-color);
         font-weight: 500;
       }
@@ -3461,7 +3461,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
   min-height: 24px;
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.15s ease;
+  transition: background-color var(--app-motion-fast) ease;
 
   &:hover {
     background-color: transparent;
@@ -3533,7 +3533,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
     border-radius: 9px;
     background: var(--stream-brand-10);
     color: color-mix(in srgb, var(--td-brand-color) 80%, var(--td-text-color-secondary));
-    font-size: 11px;
+    font-size: var(--app-text-xs);
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
@@ -3562,18 +3562,6 @@ const handleAddToKnowledge = (answerEvent: any) => {
   }
 }
 
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 @keyframes slideIn {
   from {
     opacity: 0;
@@ -3583,71 +3571,6 @@ const handleAddToKnowledge = (answerEvent: any) => {
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: scale(1.5);
-    opacity: 0.3;
-  }
-}
-
-@keyframes pulseBorder {
-
-  0%,
-  100% {
-    border-left-color: var(--td-brand-color);
-    box-shadow: 0 1px 3px var(--stream-brand-6);
-  }
-
-  50% {
-    border-left-color: var(--td-brand-color);
-    box-shadow: 0 1px 4px var(--stream-brand-12);
-  }
-}
-
-@keyframes shakeError {
-
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-
-  10%,
-  30%,
-  50%,
-  70%,
-  90% {
-    transform: translateX(-2px);
-  }
-
-  20%,
-  40%,
-  60%,
-  80% {
-    transform: translateX(2px);
-  }
-}
-
-@keyframes actionPendingShimmer {
-  0% {
-    transform: translateX(-90%);
-  }
-
-  50% {
-    transform: translateX(-5%);
-  }
-
-  100% {
-    transform: translateX(90%);
   }
 }
 
@@ -3669,7 +3592,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
   gap: 6px;
   margin-left: 4px;
   font-variant-numeric: tabular-nums;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   font-weight: 600;
   flex-shrink: 0;
   letter-spacing: 0.02em;
@@ -3687,11 +3610,11 @@ const handleAddToKnowledge = (answerEvent: any) => {
   margin: 6px 0 0;
   padding: 8px 10px;
   font-family: var(--app-font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   line-height: 1.5;
   color: var(--td-text-color-secondary);
   background: var(--td-bg-color-secondarycontainer);
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
 
   pre {
     margin: 0;
@@ -3704,12 +3627,12 @@ const handleAddToKnowledge = (answerEvent: any) => {
 
 .sandbox-file-preview-more {
   margin-top: 4px;
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   color: var(--td-text-color-placeholder);
 }
 
 .action-show-icon {
-  font-size: 12px;
+  font-size: var(--app-text-sm);
   padding: 0 2px;
   color: var(--td-text-color-placeholder);
   flex-shrink: 0;
@@ -3765,7 +3688,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
     flex-wrap: wrap;
 
     .status-icon {
-      font-size: 14px;
+      font-size: var(--app-text-base);
       flex-shrink: 0;
 
       &.in-progress {
@@ -3791,16 +3714,6 @@ const handleAddToKnowledge = (answerEvent: any) => {
       align-items: center;
       gap: 4px;
     }
-  }
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
   }
 }
 
@@ -3837,7 +3750,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
     padding: 0 4px;
 
     .fallback-label {
-      font-size: 11px;
+      font-size: var(--app-text-xs);
       color: var(--td-text-color-secondary);
       font-weight: 500;
       line-height: 1.5;
@@ -3848,14 +3761,14 @@ const handleAddToKnowledge = (answerEvent: any) => {
     position: relative;
     background: var(--td-bg-color-secondarycontainer);
     border: 1px solid var(--td-component-stroke);
-    border-radius: 6px;
+    border-radius: var(--app-radius-sm);
     overflow: hidden;
     margin: 0;
     padding: 0;
 
     .detail-output {
       font-family: var(--app-font-family-mono);
-      font-size: 11px;
+      font-size: var(--app-text-xs);
       color: var(--td-text-color-primary);
       padding: 12px;
       margin: 0;
@@ -3899,7 +3812,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
     margin-bottom: 6px;
 
     .arguments-label {
-      font-size: 12px;
+      font-size: var(--app-text-sm);
       font-weight: 600;
       color: var(--td-text-color-secondary);
       text-transform: uppercase;
@@ -3908,10 +3821,10 @@ const handleAddToKnowledge = (answerEvent: any) => {
   }
 
   .detail-code {
-    font-size: 12px;
+    font-size: var(--app-text-sm);
     background: var(--td-bg-color-container);
     padding: 10px;
-    border-radius: 6px;
+    border-radius: var(--app-radius-sm);
     font-family: var(--app-font-family-mono);
     color: var(--td-text-color-primary);
     margin: 0;
@@ -4058,7 +3971,7 @@ const handleAddToKnowledge = (answerEvent: any) => {
   }
 
   .tree-root .action-name {
-    font-size: 14px;
+    font-size: var(--app-text-base);
     color: var(--td-text-color-secondary);
   }
 
@@ -4078,204 +3991,4 @@ const handleAddToKnowledge = (answerEvent: any) => {
 }
 </style>
 
-<style lang="less">
-/* Global styles for teleported components */
-
-.wiki-graph-drawer {
-  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.08);
-
-  .wiki-reader-meta {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .wiki-reader-meta-text {
-    font-size: 13px;
-    color: var(--td-text-color-placeholder);
-  }
-
-  // Wiki drawer is a non-chat reader surface. Chat answer Markdown styles are
-  // centralized in chat-markdown.less; do not copy these rules into chat message components.
-  .wiki-reader-body {
-    line-height: 1.6;
-    font-size: 14px;
-    color: var(--td-text-color-primary);
-
-    h1 {
-      font-size: 24px;
-      margin: 28px 0 16px;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-
-    h2 {
-      font-size: 18px;
-      margin: 24px 0 12px;
-      font-weight: 600;
-      line-height: 1.4;
-    }
-
-    h3 {
-      font-size: 16px;
-      margin: 20px 0 10px;
-      font-weight: 600;
-      line-height: 1.5;
-    }
-
-    h4,
-    h5,
-    h6 {
-      font-size: 14px;
-      margin: 16px 0 8px;
-      font-weight: 600;
-      line-height: 1.5;
-    }
-
-    p {
-      margin: 0 0 14px;
-    }
-
-    ul,
-    ol {
-      margin: 0 0 14px;
-      padding-left: 24px;
-    }
-
-    li {
-      margin-bottom: 6px;
-      line-height: 1.6;
-    }
-
-    li>p {
-      margin-bottom: 6px;
-    }
-
-    blockquote {
-      margin: 0 0 14px;
-      padding: 10px 16px;
-      background: var(--td-bg-color-secondarycontainer);
-      border-left: 4px solid var(--td-component-border);
-      border-radius: 0 4px 4px 0;
-      color: var(--td-text-color-secondary);
-    }
-
-    code {
-      font-family: var(--app-font-family-mono);
-      font-size: 13px;
-      padding: 2px 4px;
-      background: var(--td-bg-color-secondarycontainer);
-      border-radius: 4px;
-      color: var(--td-brand-color);
-    }
-
-    pre {
-      margin: 0 0 14px;
-      padding: 12px 16px;
-      background: var(--td-bg-color-secondarycontainer);
-      border-radius: 6px;
-      overflow-x: auto;
-
-      code {
-        padding: 0;
-        background: transparent;
-        color: inherit;
-      }
-    }
-
-    p:has(img) {
-      text-align: center;
-      color: var(--td-text-color-secondary);
-      font-size: 13px;
-      margin-top: 16px;
-      margin-bottom: 24px;
-
-      img {
-        max-width: 100%;
-        max-height: 400px;
-        object-fit: contain;
-        border-radius: 6px;
-        display: block;
-        margin: 0 auto 8px;
-        cursor: zoom-in;
-        transition: opacity 0.2s;
-
-        &:hover {
-          opacity: 0.9;
-        }
-      }
-    }
-
-    a.wiki-content-link {
-      color: var(--td-brand-color);
-      text-decoration: none;
-      border-bottom: 1px dashed var(--td-brand-color);
-      cursor: pointer;
-      font-weight: 500;
-
-      &:hover {
-        border-bottom-style: solid;
-        text-decoration: none !important;
-      }
-    }
-
-    .chat-markdown-table {
-      width: fit-content;
-      max-width: 100%;
-      overflow-x: auto;
-      margin: 0 0 16px;
-      background: var(--td-bg-color-container);
-      border: 1px solid var(--td-component-stroke);
-      border-radius: 6px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    table {
-      display: table;
-      width: max-content;
-      min-width: 0;
-      border-collapse: separate;
-      border-spacing: 0;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    table thead {
-      background: var(--td-bg-color-secondarycontainer);
-    }
-
-    table th,
-    table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--td-component-stroke);
-      border-right: 1px solid var(--td-component-stroke);
-      text-align: left;
-      vertical-align: top;
-      word-break: break-word;
-    }
-
-    table th {
-      font-weight: 600;
-      color: var(--td-text-color-primary);
-      white-space: nowrap;
-    }
-
-    table th:last-child,
-    table td:last-child {
-      border-right: none;
-    }
-
-    table tbody tr:last-child td {
-      border-bottom: none;
-    }
-
-    table tbody tr:hover {
-      background: var(--td-bg-color-secondarycontainer);
-    }
-
-    table code {
-      font-size: 12px;
-    }
-  }
-}
-</style>
+<style lang="less" src="@/components/css/wiki-graph-drawer.less"></style>

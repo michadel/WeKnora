@@ -4142,6 +4142,7 @@ export default {
       batchDisable: 'Отключить выбранные',
       batchDelete: 'Удалить выбранные',
       confirmBatchDelete: 'Удалить выбранные записи FAQ ({count})? Это действие нельзя отменить.',
+      confirmDelete: 'Удалить эту запись FAQ? Это действие нельзя отменить.',
       batchDeleteSuccess: 'Удалено записей FAQ: {count}',
       modes: {
         questionOnly: 'Только вопросы',
@@ -4181,6 +4182,9 @@ export default {
       create: 'Создать базу знаний',
       save: 'Сохранить настройки',
       saveAndClose: 'Сохранить и закрыть',
+    },
+    footer: {
+      instantEffect: 'Изменения на этой странице применяются сразу, сохранять не нужно',
     },
     postCreateHint: {
       title: 'База знаний создана',
@@ -4971,6 +4975,12 @@ export default {
     me: 'Я',
     confirm: 'Подтвердить',
     cancel: 'Отмена',
+    unsavedChanges: {
+      title: 'Несохранённые изменения',
+      body: 'Если закрыть сейчас, изменения будут потеряны. Закрыть?',
+      discard: 'Отменить изменения',
+      keepEditing: 'Продолжить редактирование',
+    },
     save: 'Сохранить',
     delete: 'Удалить',
     edit: 'Редактировать',

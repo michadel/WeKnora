@@ -1596,9 +1596,10 @@ onBeforeRouteUpdate((to, from, next) => {
 </script>
 <style lang="less" scoped>
 .chat {
-    font-size: 20px;
-    // 右侧不留 padding，滚动条贴到内容区最右缘
-    padding: 0 0 20px 20px;
+    // 水平方向不留 padding，让滚动条贴到内容区最右缘；
+    // 消息列与输入列各自用 --chat-content-inset 做左右对称的留白（窄屏时才可见）。
+    padding: 0 0 20px 0;
+    --chat-content-inset: 20px;
     // 右侧抽屉让出的宽度。回到底部按钮按「剩余聊天列」居中，而不是整页 50%。
     --chat-right-inset: 0px;
     box-sizing: border-box;
@@ -1628,7 +1629,7 @@ onBeforeRouteUpdate((to, from, next) => {
 
     &:not(.is-embedded) {
         @media (min-width: 960px) {
-            transition: padding-right 0.3s cubic-bezier(0.22, 0.61, 0.36, 1);
+            transition: padding-right var(--app-motion-slow) cubic-bezier(0.22, 0.61, 0.36, 1);
         }
     }
 
@@ -1720,7 +1721,7 @@ onBeforeRouteUpdate((to, from, next) => {
     display: inline-flex;
     align-items: center;
     padding: 2px;
-    border-radius: 8px;
+    border-radius: var(--app-radius-md);
     box-sizing: border-box;
     background: color-mix(in srgb, var(--td-bg-color-container) 88%, transparent);
     backdrop-filter: blur(8px);
@@ -1740,7 +1741,7 @@ onBeforeRouteUpdate((to, from, next) => {
     color: var(--td-text-color-placeholder);
     background: transparent;
     cursor: pointer;
-    transition: background-color 0.15s ease, color 0.15s ease;
+    transition: background-color var(--app-motion-fast) ease, color var(--app-motion-fast) ease;
 
     &:hover {
         color: var(--td-text-color-primary);
@@ -1796,7 +1797,7 @@ onBeforeRouteUpdate((to, from, next) => {
     justify-content: center;
     cursor: pointer;
     color: var(--td-text-color-secondary);
-    transition: left 0.3s cubic-bezier(0.22, 0.61, 0.36, 1), background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    transition: left var(--app-motion-slow) cubic-bezier(0.22, 0.61, 0.36, 1), background-color var(--app-motion-base) ease, color var(--app-motion-base) ease, box-shadow var(--app-motion-base) ease;
 
     &:hover {
         background: var(--td-bg-color-container-hover);
@@ -1811,7 +1812,7 @@ onBeforeRouteUpdate((to, from, next) => {
 
 .scroll-btn-fade-enter-active,
 .scroll-btn-fade-leave-active {
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: opacity var(--app-motion-base) ease, transform var(--app-motion-base) ease;
 }
 
 .scroll-btn-fade-enter-from,
@@ -1862,6 +1863,11 @@ onBeforeRouteUpdate((to, from, next) => {
     box-sizing: border-box;
     position: relative;
 
+    &:not(.is-embedded) {
+        padding: 0 var(--chat-content-inset, 20px);
+        max-width: calc(960px + 2 * var(--chat-content-inset, 20px));
+    }
+
     &.is-embedded {
         max-width: 100%;
         width: 100%;
@@ -1881,6 +1887,12 @@ onBeforeRouteUpdate((to, from, next) => {
     flex: 1;
     margin: 0 auto;
     width: 100%;
+    box-sizing: border-box;
+
+    &:not(.is-embedded) {
+        padding: 0 var(--chat-content-inset, 20px);
+        max-width: calc(960px + 2 * var(--chat-content-inset, 20px));
+    }
 
     /*
       给每条消息加 layout/style containment：
@@ -1930,13 +1942,7 @@ onBeforeRouteUpdate((to, from, next) => {
         border: 1.5px solid var(--td-component-stroke);
         border-top-color: var(--td-text-color-secondary);
         border-radius: 50%;
-        animation: chatGlobalWaitSpin 0.8s linear infinite;
-    }
-}
-
-@keyframes chatGlobalWaitSpin {
-    to {
-        transform: rotate(360deg);
+        animation: wk-spin 0.8s linear infinite;
     }
 }
 
@@ -1959,7 +1965,7 @@ onBeforeRouteUpdate((to, from, next) => {
 @import '../../components/css/suggested-questions.less';
 
 .suggested-questions-container {
-    transition: min-height 0.3s @suggested-ease;
+    transition: min-height var(--app-motion-slow) @suggested-ease;
 }
 
 .suggested-questions-inner {

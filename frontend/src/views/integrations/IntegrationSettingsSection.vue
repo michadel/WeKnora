@@ -87,6 +87,8 @@ watch(
 </script>
 
 <style scoped lang="less">
+@import (reference) '@/components/css/settings-section.less';
+
 .integrations-settings {
   display: flex;
   flex-direction: column;
@@ -101,22 +103,7 @@ watch(
 }
 
 .section-header {
-  margin-bottom: 18px;
-
-  h2 {
-    margin: 0 0 6px;
-    color: var(--td-text-color-primary);
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 1.35;
-  }
-}
-
-.section-description {
-  margin: 0;
-  color: var(--td-text-color-secondary);
-  font-size: 13px;
-  line-height: 1.6;
+  .settings-section-header();
 }
 
 .doc-link {
@@ -133,6 +120,6 @@ watch(
 }
 
 .link-icon {
-  font-size: 13px;
+  font-size: var(--app-text-md);
 }
 </style>
