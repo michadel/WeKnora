@@ -109,9 +109,12 @@
                             <usermsg :content="session.content" :mentioned_items="session.mentioned_items"
                                 :images="session.images" :attachments="session.attachments" :embeddedMode="embeddedMode"
                                 :session-id="session_id"
+                                :message-id="session.id"
+                                :can-fork="!embeddedMode && forkAffordanceOf(session.id).canFork"
                                 :steer-failed="Boolean(session._steerFailed)"
                                 @retry-steer="handleRetrySteer(session.steer_id)"
-                                @remove-steer="handleRemoveSteer(session.steer_id)">
+                                @remove-steer="handleRemoveSteer(session.steer_id)"
+                                @fork="handleFork">
                             </usermsg>
                         </div>
                         <div v-if="session.role == 'assistant' && shouldRenderAssistantMessage(session)"
@@ -120,6 +123,8 @@
                                 :user-query="getUserQuery(index)" @scroll-bottom="scrollToBottom"
                                 :isFirstEnter="isFirstEnter" :embeddedMode="embeddedMode"
                                 :follow-up-loading="Boolean(session.suggestionLoading && !session.suggestionSet?.questions?.length)"
+                                :can-fork="!embeddedMode && forkAffordanceOf(session.id).canFork"
+                                @fork="handleFork"
                                 @render-complete-change="(ready) => handleAnswerRenderComplete(session, ready)">
                             </botmsg>
                             <FollowUpSuggestions v-if="session.answerFullyRendered && !session.steerForked && !session.suggestionsDismissed"
@@ -176,11 +181,12 @@
 import { makeSteerClientId } from '@/utils/steerId';
 import { storeToRefs } from 'pinia';
 import { ref, onMounted, onBeforeMount, onUnmounted, nextTick, watch, reactive, computed } from 'vue';
-import { useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
+import { useRoute, useRouter, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router';
 import InputField from '../../components/Input-field.vue';
 import botmsg from './components/botmsg.vue';
 import usermsg from './components/usermsg.vue';
-import { getMessageList, getSession } from "@/api/chat/index";
+import { getMessageList, getSession, forkSession } from "@/api/chat/index";
+import { resolveForkAffordance } from './forkPoint';
 import { getSuggestedQuestions } from "@/api/agent/index";
 import { deleteTemporaryAttachment, uploadTemporaryAttachment } from '@/api/chat/temporary-attachments';
 import { useStream } from '../../api/chat/streame'
@@ -277,6 +283,7 @@ const attachStreamDebugToMessage = (message) => {
     message.debugRequest = payload;
 };
 const route = useRoute();
+const router = useRouter();
 const session_id = ref(props.session_id || route.params.chatid);
 const currentSession = ref(null);
 
@@ -303,6 +310,102 @@ const inputFieldRef = ref();
 const created_at = ref('');
 const limit = ref(20);
 const messagesList = reactive([]);
+
+function forkAffordanceOf(messageId) {
+    if (!messageId) return { canFork: false }
+    return resolveForkAffordance(messagesList, messageId)
+}
+
+const FORK_PREFILL_KEY = 'weknora:fork-prefill'
+let forkInFlight = false
+
+function stashForkLanding(sessionId, text) {
+    const payload = JSON.stringify({ sessionId, text })
+    try {
+        sessionStorage.setItem(FORK_PREFILL_KEY, payload)
+    } catch {
+        // sessionStorage can throw in private mode; landing still navigates.
+    }
+}
+
+function readForkLanding() {
+    try {
+        const raw = sessionStorage.getItem(FORK_PREFILL_KEY)
+        if (!raw) return null
+        const parsed = JSON.parse(raw)
+        if (!parsed || typeof parsed !== 'object') return null
+        return {
+            sessionId: String(parsed.sessionId || ''),
+            text: String(parsed.text || ''),
+        }
+    } catch {
+        return null
+    }
+}
+
+function clearForkLanding() {
+    try {
+        sessionStorage.removeItem(FORK_PREFILL_KEY)
+    } catch {
+        // ignore
+    }
+}
+
+function applyForkLanding() {
+    const landed = readForkLanding()
+    if (!landed || landed.sessionId !== String(session_id.value || '')) {
+        return false
+    }
+    clearForkLanding()
+    inputFieldRef.value?.prefill(landed.text)
+    return true
+}
+
+async function handleFork(messageId) {
+    if (props.embeddedMode) return
+    if (forkInFlight) return
+    if (!messageId || !session_id.value) return
+    const source = messagesList.find((m) => m.id === messageId)
+    if (!source) return
+    const sourceSessionId = session_id.value
+
+    forkInFlight = true
+    try {
+        const res = await forkSession(sourceSessionId, { message_id: messageId })
+        const data = res?.data
+        if (!data?.session_id) return
+
+        // Carry the question across navigation in sessionStorage: the chat view
+        // is reused across chat/:chatid, and history reload / composer reset
+        // would clobber an in-memory prefill if we applied it too early.
+        const prefill = source.role === 'user' ? String(source.content ?? '') : ''
+        stashForkLanding(data.session_id, prefill)
+
+        const now = new Date().toISOString()
+        const sourceTitle = currentSession.value?.title || t('menu.newSession')
+        usemenuStore.updataMenuChildren({
+            id: data.session_id,
+            path: `chat/${data.session_id}`,
+            title: `${sourceTitle}（分支）`,
+            parent_session_id: sourceSessionId,
+            isMore: false,
+            isNoTitle: false,
+            created_at: now,
+            updated_at: now,
+        })
+
+        await router.push(`/platform/chat/${data.session_id}`)
+    } catch (err) {
+        if (err?.status === 409 || err?.$httpStatus === 409) {
+            MessagePlugin.warning('请等本轮回答结束后再分叉')
+            return
+        }
+        MessagePlugin.error('分叉失败，请重试')
+    } finally {
+        forkInFlight = false
+    }
+}
+
 const sessionArtifacts = computed(() => collectSessionArtifacts(messagesList));
 const sessionArtifactsCollecting = computed(() =>
     messagesList.some((message) => isCollectingSkillArtifacts(message)),
@@ -332,6 +435,14 @@ watch([activitySessionId, isReplying, isStreaming, isImRecovering, currentAssist
 const historyLoading = ref(true);
 const historyLoadingMore = ref(false);
 const hasMoreHistory = ref(true);
+
+// Prefill after THIS session's history load settles. A messagesList watch
+// would fire on the splice-to-empty that starts a session switch and then
+// get clobbered by composer reset / history mount.
+watch(historyLoading, (loading) => {
+    if (loading) return
+    applyForkLanding()
+}, { flush: 'post' })
 let fullContent = ref('')
 const scrollContainer = ref(null)
 const userHasScrolledUp = ref(false)
