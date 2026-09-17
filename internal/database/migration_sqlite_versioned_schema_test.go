@@ -26,6 +26,7 @@ var versionedSQLiteTables = []string{
 	"browser_pairings",
 	"browser_task_interruptions",
 	"fork_snapshot_leases",
+	"mcp_endpoints",
 }
 
 // versionedSQLiteColumns maps each existing table to the columns that the
@@ -45,7 +46,7 @@ var versionedSQLiteColumns = map[string][]string{
 	"mcp_tool_approvals": {"enabled"},                                                       // 000091
 }
 
-const expectedSQLiteMigrationVersion = 21
+const expectedSQLiteMigrationVersion = 22
 
 func TestSQLiteMigrationsCreateVersionedSchema(t *testing.T) {
 	repoRoot := sqliteRepoRoot(t)
