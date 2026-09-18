@@ -133,6 +133,19 @@ func parseKS3FilePath(filePath string) (bucket, objectKey string, err error) {
 	return parts[0], parts[1], nil
 }
 
+// objectKey resolves a ks3:// path of this service's bucket. The bucket is not
+// part of the key but the tenant check scans it, so it must match.
+func (s *ks3FileService) objectKey(filePath string) (string, error) {
+	bucket, objectKey, err := parseKS3FilePath(filePath)
+	if err != nil {
+		return "", err
+	}
+	if bucket != s.bucketName {
+		return "", fmt.Errorf("bucket mismatch in path: got %s, want %s", bucket, s.bucketName)
+	}
+	return objectKey, nil
+}
+
 func (s *ks3FileService) SaveFile(ctx context.Context, file *multipart.FileHeader, tenantID uint64, knowledgeID string) (string, error) {
 	ext := filepath.Ext(file.Filename)
 	objectKey := joinKS3Key(s.pathPrefix, fmt.Sprintf("%d", tenantID), knowledgeID, uuid.New().String()+ext)
@@ -188,7 +201,10 @@ func (s *ks3FileService) SaveBytes(ctx context.Context, data []byte, tenantID ui
 func (s *ks3FileService) CopyFile(ctx context.Context,
 	srcPath string, tenantID uint64, knowledgeID string,
 ) (string, error) {
-	srcBucket, srcKey, err := parseKS3FilePath(srcPath)
+	// Like COS and S3, only this service's bucket is copied server-side; a
+	// path of another scheme or bucket falls back to a streamed copy through
+	// its own backend.
+	srcKey, err := s.objectKey(srcPath)
 	if err != nil {
 		return "", fmt.Errorf("ks3 copy rejected source %q: %w", srcPath, ErrCrossBackendCopy)
 	}
@@ -202,7 +218,7 @@ func (s *ks3FileService) CopyFile(ctx context.Context,
 	_, err = s.client.CopyObject(&ks3s3.CopyObjectInput{
 		Bucket:       ks3aws.String(s.bucketName),
 		Key:          ks3aws.String(destKey),
-		SourceBucket: ks3aws.String(srcBucket),
+		SourceBucket: ks3aws.String(s.bucketName),
 		SourceKey:    ks3aws.String(srcKey),
 	})
 	if err != nil {
@@ -215,7 +231,7 @@ func (s *ks3FileService) CopyFile(ctx context.Context,
 }
 
 func (s *ks3FileService) GetFile(ctx context.Context, filePath string) (io.ReadCloser, error) {
-	_, objectKey, err := parseKS3FilePath(filePath)
+	objectKey, err := s.objectKey(filePath)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +251,7 @@ func (s *ks3FileService) GetFile(ctx context.Context, filePath string) (io.ReadC
 }
 
 func (s *ks3FileService) DeleteFile(ctx context.Context, filePath string) error {
-	_, objectKey, err := parseKS3FilePath(filePath)
+	objectKey, err := s.objectKey(filePath)
 	if err != nil {
 		return err
 	}
@@ -270,7 +286,7 @@ func (s *ks3FileService) CheckConnectivity(ctx context.Context) error {
 }
 
 func (s *ks3FileService) GetFileURL(ctx context.Context, filePath string) (string, error) {
-	_, objectKey, err := parseKS3FilePath(filePath)
+	objectKey, err := s.objectKey(filePath)
 	if err != nil {
 		return "", err
 	}
