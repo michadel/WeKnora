@@ -451,6 +451,19 @@ func (s *summarizerChat) Chat(
 	return &types.ChatResponse{Content: "## Goal\ndo the thing", FinishReason: "stop"}, nil
 }
 
+// ChatStream is how compaction calls the summarizer.
+func (s *summarizerChat) ChatStream(
+	ctx context.Context, messages []chat.Message, opts *chat.ChatOptions,
+) (<-chan types.StreamResponse, error) {
+	resp, _ := s.Chat(ctx, messages, opts)
+	ch := make(chan types.StreamResponse, 1)
+	ch <- types.StreamResponse{
+		ResponseType: types.ResponseTypeAnswer, Content: resp.Content, Done: true, FinishReason: resp.FinishReason,
+	}
+	close(ch)
+	return ch, nil
+}
+
 // The bug this replaces: inside one ReAct turn nothing was compactable, so
 // every round crossed the threshold, spent a summarization call, and freed
 // nothing. The loop is only broken if a second pass over the compacted context
@@ -575,6 +588,39 @@ func TestContextCheckpointFailureKeepsTheCompaction(t *testing.T) {
 	require.Less(t, engine.tokenEstimator.EstimateMessages(compacted), before/2)
 }
 
+// A compaction can be discarded for freeing too little and still have
+// summarized the stored history in full: a short stored history next to a
+// live turn whose weight is one result the cut cannot reach. That summary is a
+// valid checkpoint, and dropping it would have the next turn pay for it again.
+func TestContextCheckpointIsKeptWhenTheCompactionFreesTooLittle(t *testing.T) {
+	engine := newTestEngine(t, &summarizerChat{},
+		withMaxContextTokens(40000), withMaxCompletionTokens(4000))
+	sink := &recordingCheckpointSink{}
+	engine.SetContextCheckpointSink(sink)
+
+	messages := []chat.Message{
+		{Role: "system", Content: "you are an agent"},
+		{Role: "user", Content: "first question", TurnID: "turn-a"},
+		{Role: "assistant", Content: "first answer", TurnID: "turn-a"},
+		{Role: "user", Content: "read the export"},
+		{Role: "assistant", ToolCalls: []chat.ToolCall{{
+			ID: "call-1", Type: "function",
+			Function: chat.FunctionCall{Name: "read_file", Arguments: `{"path":"/w/export.csv"}`},
+		}}},
+		{Role: "tool", Name: "read_file", ToolCallID: "call-1", Content: strings.Repeat("row,value ", 12000)},
+	}
+	before := engine.tokenEstimator.EstimateMessages(messages)
+	require.True(t, engine.compactor.Settings().ShouldCompact(before))
+
+	result, err := engine.compactor.Compact(context.Background(), messages, compaction.ReasonThreshold)
+	require.NoError(t, err)
+	require.Less(t, result.Freed(), result.TokensBefore/minFreedFraction,
+		"the fixture must be a compaction the engine discards")
+
+	engine.manageContextWindow(context.Background(), messages, 1, before)
+	require.Equal(t, []string{"turn-a"}, sink.turnIDs)
+}
+
 // Redacting a stored KB result must not detach it from its turn, or a summary
 // ending on that turn could no longer be recognized as ending there.
 func TestRedactHistoryKBResultsKeepsTurnID(t *testing.T) {
@@ -585,6 +631,44 @@ func TestRedactHistoryKBResultsKeepsTurnID(t *testing.T) {
 	require.Len(t, redacted, 1)
 	require.NotEqual(t, "stale chunk", redacted[0].Content)
 	require.Equal(t, "turn-a", redacted[0].TurnID)
+}
+
+// History loads up to the whole window, past the compaction threshold, so the
+// overflow reaches the first round's compaction instead of being dropped by
+// the loader before compaction can see it.
+func TestHistoryTokenBudgetExceedsTheCompactionThreshold(t *testing.T) {
+	for _, tc := range []struct{ window, completion int }{
+		{window: 40000, completion: 4000},
+		{window: 200000, completion: 24576},
+		{window: 32768, completion: 0},
+	} {
+		engine := newTestEngine(t, &mockChat{},
+			withMaxContextTokens(tc.window), withMaxCompletionTokens(tc.completion))
+		budget := HistoryTokenBudget(engine.config)
+		require.Equal(t, tc.window, budget)
+		require.Greater(t, budget, engine.compactor.Settings().Threshold(),
+			"window=%d completion=%d", tc.window, tc.completion)
+	}
+	require.Equal(t, types.DefaultMaxContextTokens, HistoryTokenBudget(&types.AgentConfig{}),
+		"an unresolved window falls back to the default")
+}
+
+// The history loader prices turns with HistoryAsSent, so it must match what
+// buildMessagesWithLLMContext sends under both settings.
+func TestHistoryAsSentFollowsTheRetainSetting(t *testing.T) {
+	history := []chat.Message{
+		{Role: "tool", Name: agenttools.ToolWikiReadPage, ToolCallID: "c1", Content: "full page"},
+		{Role: "tool", Name: agenttools.ToolWebFetch, ToolCallID: "c2", Content: "fetched"},
+	}
+
+	redacted := HistoryAsSent(history, false)
+	require.NotEqual(t, "full page", redacted[0].Content)
+	require.Equal(t, "fetched", redacted[1].Content, "only KB and Wiki results are redacted")
+	require.Equal(t, "full page", HistoryAsSent(history, true)[0].Content)
+
+	engine := newTestEngine(t, &mockChat{})
+	sent := engine.buildMessagesWithLLMContext("system", "next", "s1", history, nil)
+	require.Equal(t, redacted[0].Content, sent[1].Content)
 }
 
 // Asking for more output than the window can still hold is rejected outright
