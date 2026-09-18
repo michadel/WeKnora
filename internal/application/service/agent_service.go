@@ -242,6 +242,7 @@ func (s *agentService) CreateAgentEngine(
 		pinnedMCP,
 		s.resolvePinnedSkillInfos(config),
 	)
+	engine.SetQuestionOrigin(s.resolveQuestionOriginInfo(ctx, config.QuestionOrigin, config.SearchTargets, kbInfos))
 
 	// Non-vision chat models use the configured VLM to describe tool images.
 	// Vision chat models receive the original images after the tool replies.
@@ -1343,6 +1344,45 @@ func kbRetrievalCapabilities(kb *types.KnowledgeBase) []string {
 
 // getSelectedDocumentInfos retrieves detailed information for user-selected documents (via @ mention)
 // This loads the actual content of the documents to include in the system prompt
+// resolveQuestionOriginInfo turns a suggested question's origin into the
+// names the runtime context shows. It re-checks the base against this turn's
+// search targets rather than trusting the caller, and keeps a document only
+// when it belongs to that base. A base reached only through a document or tag
+// scope is not in kbInfos when other bases are selected, so its name is
+// looked up directly.
+func (s *agentService) resolveQuestionOriginInfo(
+	ctx context.Context, origin *types.QuestionOrigin, targets types.SearchTargets,
+	kbInfos []*agent.KnowledgeBaseInfo,
+) *agent.QuestionOriginInfo {
+	if origin == nil || origin.KnowledgeBaseID == "" || !targets.ContainsKB(origin.KnowledgeBaseID) {
+		return nil
+	}
+	info := &agent.QuestionOriginInfo{KnowledgeBaseID: origin.KnowledgeBaseID}
+	for _, kb := range kbInfos {
+		if kb != nil && kb.ID == origin.KnowledgeBaseID {
+			info.KnowledgeBaseName = kb.Name
+			break
+		}
+	}
+	if info.KnowledgeBaseName == "" && s.knowledgeBaseService != nil {
+		kb, err := s.knowledgeBaseService.GetKnowledgeBaseByID(ctx, origin.KnowledgeBaseID)
+		if err == nil && kb != nil {
+			info.KnowledgeBaseName = kb.Name
+		}
+	}
+	if origin.KnowledgeID == "" {
+		return info
+	}
+	docs, err := s.getSelectedDocumentInfos(ctx, []string{origin.KnowledgeID})
+	if err != nil || len(docs) != 1 || docs[0].KnowledgeBaseID != origin.KnowledgeBaseID {
+		logger.Infof(ctx, "Question origin document %s dropped: not found in knowledge base %s",
+			secutils.SanitizeForLog(origin.KnowledgeID), secutils.SanitizeForLog(origin.KnowledgeBaseID))
+		return info
+	}
+	info.Document = docs[0]
+	return info
+}
+
 func (s *agentService) getSelectedDocumentInfos(ctx context.Context, knowledgeIDs []string) ([]*agent.SelectedDocumentInfo, error) {
 	if len(knowledgeIDs) == 0 {
 		return []*agent.SelectedDocumentInfo{}, nil

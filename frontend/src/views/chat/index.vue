@@ -80,7 +80,7 @@
                                 <div class="suggested-questions-grid">
                                     <div v-for="(item, index) in suggestedQuestions" :key="item.question"
                                         class="suggested-question-card"
-                                        @click="handleSuggestedQuestionClick(item.question)">
+                                        @click="handleSuggestedQuestionClick(item)">
                                         <span class="suggested-question-text">{{ item.question }}</span>
                                         <span v-if="item.source === 'faq'"
                                             class="suggested-question-badge faq">FAQ</span>
@@ -155,7 +155,7 @@
         </transition>
         <div class="input-container" :class="{ 'is-embedded': embeddedMode }">
             <InputField ref="inputFieldRef" :auto-focus="focusComposerOnMount"
-                @send-msg="(query, modelId, mentionedItems, imageFiles, attachmentFiles) => sendMsg(query, modelId, mentionedItems, imageFiles, attachmentFiles)"
+                @send-msg="(query, modelId, mentionedItems, imageFiles, attachmentFiles, options) => sendMsg(query, modelId, mentionedItems, imageFiles, attachmentFiles, options)"
                 @steer-msg="(query, mentionedItems, delivery) => handleSteerMsg(query, mentionedItems, delivery)"
                 @promote-steer="handlePromoteSteer"
                 @remove-steer="handleRemoveSteer"
@@ -189,6 +189,7 @@ import usermsg from './components/usermsg.vue';
 import { getMessageList, getSession, forkSession } from "@/api/chat/index";
 import { resolveForkAffordance } from './forkPoint';
 import { getSuggestedQuestions } from "@/api/agent/index";
+import { questionOriginFromSuggestion } from '@/utils/questionOrigin';
 import { deleteTemporaryAttachment, uploadTemporaryAttachment } from '@/api/chat/temporary-attachments';
 import { useStream } from '../../api/chat/streame'
 import { listSteerSession, promoteSteerSession, removeSteerSession, steerSession } from '@/api/chat/steer';
@@ -254,7 +255,7 @@ const isAgentStreamSession = () => {
 const uiStore = useUIStore();
 const { navigateToKnowledgeBaseList } = useKnowledgeBaseCreationNavigation();
 const { t } = useI18n();
-const { firstQuery, firstMentionedItems, firstModelId, firstImageFiles, firstAttachmentFiles } = storeToRefs(usemenuStore);
+const { firstQuery, firstMentionedItems, firstModelId, firstImageFiles, firstAttachmentFiles, firstQuestionOrigin } = storeToRefs(usemenuStore);
 // Capture before the initial send consumes firstQuery; the child focuses after mounting.
 const focusComposerOnMount = Boolean(firstQuery.value);
 const { onChunk, error, isStreaming, startStream, stopStream, lastStreamRequest } = useStream();
@@ -545,11 +546,13 @@ const fetchSuggestedQuestions = async () => {
     }
 };
 
-const handleSuggestedQuestionClick = (question) => {
+// The suggestion's source rides with this send only, as a retrieval hint.
+const handleSuggestedQuestionClick = (item) => {
+    const options = { questionOrigin: questionOriginFromSuggestion(item) };
     if (inputFieldRef.value?.triggerSend) {
-        inputFieldRef.value.triggerSend(question);
+        inputFieldRef.value.triggerSend(item.question, options);
     } else {
-        sendMsg(question);
+        sendMsg(item.question, '', [], [], [], options);
     }
 };
 
@@ -1221,7 +1224,7 @@ const attachSteerFollowUp = async (completedAssistantId) => {
     }
 };
 
-const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = [], attachmentFiles = []) => {
+const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = [], attachmentFiles = [], options = {}) => {
     stopStream();
     prepareForNewOutgoingMessage();
     activitySessionId.value = String(session_id.value);
@@ -1400,6 +1403,7 @@ const sendMsg = async (value, modelId = '', mentionedItems = [], imageFiles = []
         attachment_ids: attachmentIds.length > 0 ? attachmentIds : undefined,
         query: value,
         suggestion_attribution: suggestionAttribution || undefined,
+        question_origin: options?.questionOrigin,
         method: 'POST',
         url: endpoint,
     });
@@ -1548,7 +1552,7 @@ onMounted(async () => {
                 rerankModelId: '',
             });
         }
-        sendMsg(firstQuery.value, firstModelId.value || '', firstMentionedItems.value || [], firstImageFiles.value || [], firstAttachmentFiles.value || []);
+        sendMsg(firstQuery.value, firstModelId.value || '', firstMentionedItems.value || [], firstImageFiles.value || [], firstAttachmentFiles.value || [], { questionOrigin: firstQuestionOrigin.value || undefined });
         usemenuStore.changeFirstQuery('', [], '', [], []);
     } else {
         scrollLock.value = false;
