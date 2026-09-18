@@ -156,3 +156,23 @@ test('agent skill picker uses the catalog and only enables ready installs', () =
   assert.doesNotMatch(source, /skill-list-summary/)
   assert.doesNotMatch(source, /skill-ready-stat/)
 })
+
+test('agent skill picker offers upgrades to admins only and keeps upgrading skills selected', () => {
+  assert.match(source, /from '@\/utils\/skillUpgrade'/)
+  assert.match(source, /const upgradable = Boolean\(inst && installUpgradable\(item, inst\)\)/)
+  assert.match(source, /canInstallSkills\.value && hasSandboxSelected\.value && skill\.upgradable/)
+  assert.match(source, /v-if="canUpgradeSkillRow\(skill\)"/)
+  assert.match(source, /v-else-if="canUpgradeSkillRow\(skill\)"/)
+  assert.match(source, /agent\.editor\.upgradeOnThisSandbox/)
+  // The progress drawer reads admin-only endpoints, so it is not offered to others.
+  assert.match(source, /v-else-if="canInstallSkills && isSkillBusy\(skill\)"/)
+  assert.match(source, /skill\.selectable \|\| \(skill\.installed && isSkillBusy\(skill\)\)/)
+})
+
+test('a skill whose previous version still runs stays selectable during and after an upgrade', () => {
+  assert.match(source, /installEnabled && \(installStatus === 'ready' \|\| Boolean\(servedNote\)\)/)
+  assert.match(source, /v-if="skill\.selectable && skill\.servedNote"/)
+  // Installing the catalog version over a failed upgrade is the upgrade retried.
+  assert.match(source, /installsAnUpgrade\(skill\) \? \$t\('settings\.skills\.upgrade'\) : \$t\('agent\.editor\.installShort'\)/)
+  assert.match(source, /return skill\.upgradable \|\| Boolean\(skill\.servedNote\)/)
+})
