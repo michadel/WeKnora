@@ -2898,6 +2898,8 @@ export default {
         targetType: 'Target type',
         targetId: 'Target ID',
         actorId: 'Initiator ID',
+        apiKeyName: 'API key name',
+        apiKeyId: 'API key ID',
         details: 'Details'
       },
       drawer: {
@@ -2907,6 +2909,8 @@ export default {
         targetChange: 'Change details'
       },
       systemActor: 'System',
+      actorWithAPIKey: '{actor} · API Key · {name}',
+      actorAPIKey: 'API Key · {name}',
       knowledgeBase: 'Knowledge base',
       countItems: '{count} items',
       titleWithCount: '{title} and {count} more',
