@@ -256,7 +256,6 @@ func (e *VolcengineEmbedder) BatchEmbed(ctx context.Context, texts []string) ([]
 	}
 
 	return embeddings, nil
-
 }
 
 // GetModelName returns the model name
