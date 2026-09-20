@@ -317,6 +317,10 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
     return out
   }
 
+  const agentStepsAreTruncated = (agentSteps: unknown[] | undefined) =>
+    Array.isArray(agentSteps) &&
+    agentSteps.some((step) => (step as ChatMessage | undefined)?.truncated === true)
+
   const reconstructEventStreamFromSteps = (
     agentSteps: unknown[],
     messageContent: string,
@@ -407,6 +411,11 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         done: true,
       }
       if (isFallback) answerEvent.is_fallback = true
+      // A round the completion cap cut off marks its step. Live streaming
+      // carries the same fact on the answer event, but history is rebuilt from
+      // agent_steps and never sees those events, so without this a reloaded
+      // half-written answer looks finished.
+      if (agentStepsAreTruncated(agentSteps)) answerEvent.truncated = true
       events.push(answerEvent)
     } else if (isCompleted) {
       events.push({
@@ -459,6 +468,7 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
           ),
         )
         item.hideContent = true
+        if (agentStepsAreTruncated(item.agent_steps as unknown[])) item.truncated = true
       }
 
       restoreQuickAnswerFlags(item)
@@ -933,6 +943,13 @@ export function useChatStreamHandler(options: UseChatStreamHandlerOptions) {
         if (dataPayload?.is_fallback) {
           answerEvent.is_fallback = true
           message.is_fallback = true
+        }
+        // The completion cap cut this answer off. The backend sends it on the
+        // content chunks and again on the Done marker, because an answer that
+        // streamed live only learns of the cap at the close.
+        if (dataPayload?.truncated) {
+          answerEvent.truncated = true
+          message.truncated = true
         }
         if (data.done && !answerEvent.done) {
           answerEvent.done = true
