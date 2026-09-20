@@ -2483,6 +2483,8 @@ export default {
       discard: '変更を破棄',
       keepEditing: '編集を続ける',
     },
+    fullscreen: '全画面',
+    exitFullscreen: '全画面を終了',
     save: '保存',
     delete: '削除',
     edit: '編集',
@@ -2585,11 +2587,21 @@ export default {
       link: 'リンクを挿入',
       image: '画像を挿入',
       table: '表を挿入',
-      horizontalRule: '水平線'
+      horizontalRule: '水平線',
+      headingGroup: '見出し',
+      insertGroup: '挿入'
+    },
+    shortcuts: {
+      title: 'ショートカット',
+      continueList: 'リストを続ける',
+      indent: 'インデント / Shift+Tab で解除'
     },
     view: {
-      editLabel: '編集に戻る',
-      previewLabel: '内容をプレビュー'
+      edit: '編集',
+      split: '分割',
+      preview: 'プレビュー',
+      splitUnavailable: '幅が足りません。ドロワーを広げるか全画面にすると分割できます',
+      groupLabel: 'エディタ表示'
     },
     preview: {
       empty: 'まだ内容がありません'
@@ -2598,9 +2610,7 @@ export default {
       edit: 'Markdownナレッジを編集',
       create: 'Markdownナレッジを作成'
     },
-    description: 'Markdownでナレッジを記述し、リアルタイムでプレビューできます',
     section: {
-      basic: '基本情報',
       content: '内容'
     },
     labels: {
@@ -2622,9 +2632,9 @@ export default {
       published: 'ナレッジを公開し、インデックス作成を開始しました'
     },
     form: {
-      knowledgeBaseLabel: '対象のナレッジベース',
       knowledgeBasePlaceholder: 'ナレッジベースを選択',
       titleLabel: 'ナレッジのタイトル',
+      knowledgeBaseLabel: '対象のナレッジベース',
       titlePlaceholder: 'タイトルを入力',
       contentPlaceholder: 'Markdownに対応しています。#見出し、リスト、コードブロックなどが使えます。'
     },
@@ -2632,7 +2642,8 @@ export default {
     status: {
       draftTag: 'ステータス: 下書き',
       publishedTag: 'ステータス: 公開済み',
-      lastUpdated: '最終更新: {time}'
+      lastUpdated: '最終更新: {time}',
+      counter: '{chars} 文字 · {lines} 行'
     },
     loading: {
       content: '内容を読み込み中...',
@@ -3797,6 +3808,7 @@ export default {
     processError: '処理エラー',
     sessionExcerpt: 'セッション抜粋',
     noAnswerContent: '（回答内容なし）',
+    manualSourcesHeading: '参照元',
     noMatchFound: '一致する内容が見つかりません',
     deleteSessionFailed: '削除に失敗しました。しばらくしてから再試行してください！',
     imageTooMany: '画像は最大5枚までです',

@@ -3925,6 +3925,7 @@ export default {
     processError: '处理出错',
     sessionExcerpt: '会话摘录',
     noAnswerContent: '（无回答内容）',
+    manualSourcesHeading: '参考来源',
     noMatchFound: '未找到匹配的内容',
     deleteSessionFailed: '删除失败，请稍后再试！',
     imageTooMany: '最多上传5张图片',
@@ -4921,7 +4922,6 @@ export default {
     }
   },
   manualEditor: {
-    description: '使用 Markdown 编写知识内容，支持实时预览',
     defaultTitlePrefix: '新建文档',
     noDocumentKnowledgeBases: '暂无可用的文档型知识库，请先创建一个文档型知识库',
     actions: {
@@ -4936,12 +4936,13 @@ export default {
     status: {
       draftTag: '当前状态：草稿',
       publishedTag: '当前状态：已发布',
-      lastUpdated: '最近更新：{time}'
+      lastUpdated: '最近更新：{time}',
+      counter: '{chars} 字 · {lines} 行'
     },
     form: {
-      knowledgeBaseLabel: '目标知识库',
       knowledgeBasePlaceholder: '请选择知识库',
       titleLabel: '知识标题',
+      knowledgeBaseLabel: '目标知识库',
       titlePlaceholder: '请输入标题',
       contentPlaceholder: '支持 Markdown 语法，可使用 # 标题、列表、代码块等'
     },
@@ -4963,7 +4964,6 @@ export default {
       currentKnowledgeBase: '当前知识库'
     },
     section: {
-      basic: '基本信息',
       content: '知识内容'
     },
     title: {
@@ -4973,9 +4973,17 @@ export default {
     preview: {
       empty: '暂无内容'
     },
+    shortcuts: {
+      title: '快捷键',
+      continueList: '列表内自动续行',
+      indent: '缩进 / Shift+Tab 反缩进'
+    },
     view: {
-      editLabel: '返回编辑',
-      previewLabel: '预览内容'
+      edit: '编辑',
+      split: '分屏',
+      preview: '预览',
+      splitUnavailable: '宽度不足，拖宽抽屉或全屏后可用分屏',
+      groupLabel: '编辑区视图'
     },
     toolbar: {
       bold: '加粗',
@@ -4993,7 +5001,9 @@ export default {
       link: '插入链接',
       image: '插入图片',
       table: '插入表格',
-      horizontalRule: '分割线'
+      horizontalRule: '分割线',
+      headingGroup: '标题',
+      insertGroup: '插入'
     },
     table: {
       column1: '列1',
@@ -5039,6 +5049,8 @@ export default {
       discard: '放弃更改',
       keepEditing: '继续编辑',
     },
+    fullscreen: '全屏',
+    exitFullscreen: '退出全屏',
     save: '保存',
     delete: '删除',
     edit: '编辑',
