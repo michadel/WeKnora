@@ -77,6 +77,18 @@ func init() {
 			types.ModelTypeVLLM,
 		},
 		Compat: catalog.VendorCompat{
+			Embeddings: catalog.EmbeddingsCompat{
+				// https://openrouter.ai/docs/api/api-reference/embeddings/create-embeddings:
+				// model, input, dimensions, encoding_format, input_type, provider,
+				// user. input_type is a free-form string handed to whichever
+				// upstream serves the model ("e.g. search_query,
+				// search_document"), so its vocabulary is the upstream's, and on
+				// an asymmetric model it changes the document vectors. Not
+				// declared, for the reason Jina's task is not
+				// (Tencent/WeKnora#1401).
+				SendEncodingFormat: catalog.Ptr(true),
+				DimensionsField:    catalog.Ptr("dimensions"),
+			},
 			OpenAICompletions: catalog.OpenAICompletionsCompat{
 				ThinkingFormat:          catalog.Ptr(catalog.ThinkingFormatOpenRouter),
 				SupportsReasoningEffort: catalog.Ptr(true),
