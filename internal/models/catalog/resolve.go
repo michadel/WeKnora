@@ -81,6 +81,11 @@ type Resolved struct {
 	// for the same reason.
 	EmbeddingAPI api.EmbeddingAPI
 	Embeddings   EmbeddingsSettings
+
+	// TranscriptionAPI and Transcriptions are filled only for an ASR
+	// reference.
+	TranscriptionAPI api.TranscriptionAPI
+	Transcriptions   TranscriptionsSettings
 }
 
 // Resolve merges the vendor, catalog entry, extra-config and per-row
@@ -121,6 +126,9 @@ func Resolve(ref Ref) (*Resolved, error) {
 	}
 	if modelType == types.ModelTypeEmbedding {
 		return resolveEmbeddings(ref, vendor, spec, cataloged, baseURL)
+	}
+	if modelType == types.ModelTypeASR {
+		return resolveTranscriptions(ref, vendor, spec, cataloged, baseURL)
 	}
 
 	resolvedAPI := spec.API
@@ -531,6 +539,65 @@ func resolveEmbeddings(
 		RemoteModel:  ref.Model,
 		EmbeddingAPI: protocol,
 		Embeddings:   settings,
+	}
+	if override := strings.TrimSpace(ref.Extra[ExtraRemoteModelName]); override != "" {
+		out.RemoteModel = override
+	}
+	return out, nil
+}
+
+// resolveTranscriptions merges the speech-to-text layers, in the same order
+// as resolveEmbeddings: protocol default, vendor compat, the catalog entry,
+// the row's own compat, then remote_model_name.
+func resolveTranscriptions(
+	ref Ref, vendor *Vendor, spec ModelSpec, cataloged bool, baseURL string,
+) (*Resolved, error) {
+	protocol := vendor.TranscriptionAPI
+	if protocol == "" {
+		protocol = api.TranscriptionOpenAI
+	}
+	settings := DefaultTranscriptions()
+	apply(&settings, &vendor.Compat.Transcriptions)
+	for _, raw := range []json.RawMessage{spec.Compat, ref.Override.CompatJSON()} {
+		if len(raw) == 0 {
+			continue
+		}
+		overlay := &TranscriptionsCompat{}
+		if err := decodeCompat(raw, overlay); err != nil {
+			return nil, fmt.Errorf("transcriptions compat: %w", err)
+		}
+		apply(&settings, overlay)
+	}
+	if settings.API != "" {
+		protocol = settings.API
+	}
+	if !protocol.Known() {
+		return nil, fmt.Errorf("catalog: unknown transcription api %q for %s/%s", protocol, vendor.ID, spec.ID)
+	}
+	settings.API = protocol
+	switch settings.LanguageParam {
+	case "", LanguageForm, LanguageHeader, LanguageASROptions:
+	default:
+		return nil, fmt.Errorf("catalog: unknown language_param %q for %s/%s",
+			settings.LanguageParam, vendor.ID, spec.ID)
+	}
+	// Checked after every layer: an entry may lift a vendor-wide refusal for
+	// the one model that takes the audio in the request.
+	if settings.UnsupportedReason != "" {
+		return nil, fmt.Errorf(
+			"catalog: %s does not serve %q through a protocol this build implements: %s",
+			vendor.ID, spec.ID, settings.UnsupportedReason,
+		)
+	}
+
+	out := &Resolved{
+		Vendor:           vendor,
+		Spec:             spec,
+		Cataloged:        cataloged,
+		BaseURL:          baseURL,
+		RemoteModel:      ref.Model,
+		TranscriptionAPI: protocol,
+		Transcriptions:   settings,
 	}
 	if override := strings.TrimSpace(ref.Extra[ExtraRemoteModelName]); override != "" {
 		out.RemoteModel = override

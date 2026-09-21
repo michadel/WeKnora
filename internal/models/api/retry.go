@@ -49,12 +49,23 @@ func (p RetryPolicy) delay(attempt int) time.Duration {
 // Here the last error is captured in the enclosing scope on purpose and the
 // function cannot fall through without it.
 //
-// Only transport failures are retried. A non-2xx reply is the vendor
-// answering, and repeating a rejected request neither fixes it nor tells the
-// operator anything new.
+// Only transport failures are retried, including a reply cut off while it
+// was being read. A non-2xx reply is the vendor answering, and repeating a
+// rejected request neither fixes it nor tells the operator anything new; a
+// reply that arrived whole but does not decode is the same answer every time,
+// and sending it again would bill the request twice.
 func (e Endpoint) PostJSONWithRetry(
 	ctx context.Context, url string, body, out any, policy RetryPolicy, label string,
 ) error {
+	return withRetry(ctx, policy, label, func() error {
+		return e.PostJSON(ctx, url, body, out)
+	})
+}
+
+// withRetry runs send until it succeeds, fails with anything other than a
+// TransportError, or the budget runs out. The last error lives in the
+// enclosing scope and the loop cannot fall through without it.
+func withRetry(ctx context.Context, policy RetryPolicy, label string, send func() error) error {
 	var lastErr error
 	for attempt := 0; attempt <= policy.MaxRetries; attempt++ {
 		if attempt > 0 {
@@ -67,12 +78,12 @@ func (e Endpoint) PostJSONWithRetry(
 				return ctx.Err()
 			}
 		}
-		err := e.PostJSON(ctx, url, body, out)
+		err := send()
 		if err == nil {
 			return nil
 		}
-		var httpErr *HTTPError
-		if errors.As(err, &httpErr) {
+		var transportErr *TransportError
+		if !errors.As(err, &transportErr) {
 			return err
 		}
 		lastErr = err

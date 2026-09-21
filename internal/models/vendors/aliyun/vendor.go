@@ -136,6 +136,7 @@ func init() {
 			types.ModelTypeEmbedding,
 			types.ModelTypeRerank,
 			types.ModelTypeVLLM,
+			types.ModelTypeASR,
 		},
 		RerankAPI: api.RerankDashScope,
 		// Text and multimodal embeddings live under different roots of the
@@ -160,6 +161,13 @@ func init() {
 			return root + "/compatible-mode/v1/embeddings", nil
 		},
 		Compat: catalog.VendorCompat{
+			// ASR: qwen3-asr-flash is the one recognition model callable with
+			// the audio in the request, on the compatible chat endpoint as a
+			// base64 data URI; its catalog entry declares that. Every other
+			// ASR name falls to a catch-all entry that refuses it: Paraformer,
+			// Fun-ASR and the *-filetrans models are asynchronous tasks that
+			// take a public file URL, which no protocol here can send
+			// (https://help.aliyun.com/zh/model-studio/qwen-asr-api-reference).
 			// Text models: the OpenAI-compatible endpoint
 			// (https://help.aliyun.com/zh/model-studio/embedding-interfaces-compatible-with-openai),
 			// which takes model, input, dimensions and encoding_format.
