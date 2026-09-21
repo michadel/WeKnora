@@ -1281,6 +1281,9 @@ func (h *Handler) executeQA(reqCtx *qaRequestContext, mode qaMode, generateTitle
 			if data.IsFallback {
 				streamCtx.assistantMessage.IsFallback = true
 			}
+			if data.Truncated {
+				markQuickAnswerTruncated(streamCtx.assistantMessage)
+			}
 			if data.Done {
 				if completionHandled {
 					return nil
