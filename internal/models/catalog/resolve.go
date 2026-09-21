@@ -3,6 +3,7 @@ package catalog
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/Tencent/WeKnora/internal/models/api"
@@ -21,6 +22,16 @@ const (
 	// ExtraThinkingControl is the legacy thinking encoding selector written
 	// by older UIs: none | enable_thinking | thinking_type | chat_template_kwargs.
 	ExtraThinkingControl = "thinking_control"
+	// ExtraTruncatePromptTokens is the vLLM-only server-side truncation
+	// budget for rerank, opt-in per row. It is never sent unless the operator
+	// set it: vendors that do not implement it reject the unknown field.
+	ExtraTruncatePromptTokens = "truncate_prompt_tokens"
+	// ExtraScoreScale overrides the vendor rerank score scale for one row.
+	// A self-hosted gateway serves whatever reranker was deployed behind it
+	// and the two families disagree: BGE-class models answer a 0..1
+	// probability, Qwen3-Reranker-class models an unbounded score. A vendor
+	// can only state what its own documentation shows.
+	ExtraScoreScale = "score_scale"
 )
 
 // Ref identifies one configured model.
@@ -51,6 +62,12 @@ type Resolved struct {
 	OpenAIResponses    OpenAIResponsesSettings
 	AnthropicMessages  AnthropicMessagesSettings
 	GoogleGenerativeAI GoogleGenerativeAISettings
+
+	// RerankAPI and Rerank are filled only when the reference asked for a
+	// rerank model. Chat resolution is on every request's hot path, so the
+	// rerank overlay is not merged for it.
+	RerankAPI api.RerankAPI
+	Rerank    RerankSettings
 }
 
 // Resolve merges the vendor, catalog entry, extra-config and per-row
@@ -84,6 +101,10 @@ func Resolve(ref Ref) (*Resolved, error) {
 	}
 	if ref.Override != nil {
 		applySpecOverride(&spec, ref.Override)
+	}
+
+	if modelType == types.ModelTypeRerank {
+		return resolveRerank(ref, vendor, spec, cataloged, baseURL)
 	}
 
 	resolvedAPI := spec.API
@@ -345,4 +366,85 @@ func (r *Resolved) Capabilities() Capabilities {
 	}
 	caps.ThinkingLevels = r.ThinkingLevels.SupportedLevels()
 	return caps
+}
+
+// resolveRerank merges the rerank layers. Rerank has one settings struct
+// rather than one per protocol, so the model entry's compat object is decoded
+// unconditionally instead of being matched against a protocol.
+func resolveRerank(
+	ref Ref, vendor *Vendor, spec ModelSpec, cataloged bool, baseURL string,
+) (*Resolved, error) {
+	protocol := vendor.RerankAPI
+	if protocol == "" {
+		protocol = api.RerankCohere
+	}
+	if !protocol.Known() {
+		return nil, fmt.Errorf("catalog: unknown rerank api %q for provider %s", protocol, vendor.ID)
+	}
+
+	// Lowest precedence first: protocol default, vendor, model entry, row spec
+	// override. extra_config is the operator speaking about this one row, so it
+	// comes last.
+	settings := DefaultRerank()
+	apply(&settings, &vendor.Compat.Rerank)
+	if len(spec.Compat) > 0 {
+		overlay := &RerankCompat{}
+		if err := decodeCompat(spec.Compat, overlay); err != nil {
+			return nil, fmt.Errorf("rerank compat: %w", err)
+		}
+		apply(&settings, overlay)
+	}
+	if raw := ref.Override.CompatJSON(); len(raw) > 0 {
+		overlay := &RerankCompat{}
+		if err := decodeCompat(raw, overlay); err != nil {
+			return nil, fmt.Errorf("rerank compat: %w", err)
+		}
+		apply(&settings, overlay)
+	}
+
+	if raw := strings.TrimSpace(ref.Extra[ExtraScoreScale]); raw != "" {
+		scale := api.ScoreScale(strings.ToLower(raw))
+		if scale != api.ScoreProbability && scale != api.ScoreLogit {
+			return nil, fmt.Errorf(
+				"catalog: invalid %s in extra_config: %q (expected %q or %q)",
+				ExtraScoreScale, raw, api.ScoreProbability, api.ScoreLogit,
+			)
+		}
+		settings.ScoreScale = scale
+	}
+	if raw := strings.TrimSpace(ref.Extra[ExtraTruncatePromptTokens]); raw != "" {
+		if !settings.AcceptsTruncatePromptTokens {
+			return nil, fmt.Errorf(
+				"catalog: %s is a vLLM extension and %s does not implement it; "+
+					"remove it from extra_config (it is accepted by self-hosted runtimes only)",
+				ExtraTruncatePromptTokens, vendor.ID,
+			)
+		}
+		budget, err := strconv.Atoi(raw)
+		if err != nil || budget <= 0 {
+			return nil, fmt.Errorf("catalog: invalid %s in extra_config: %q", ExtraTruncatePromptTokens, raw)
+		}
+		settings.TruncatePromptTokens = budget
+	}
+	// Checked after every layer: a model entry is what declares a dialect
+	// this build cannot speak.
+	if settings.UnsupportedReason != "" {
+		return nil, fmt.Errorf(
+			"catalog: %s does not serve %q through a protocol this build implements: %s",
+			vendor.ID, spec.ID, settings.UnsupportedReason,
+		)
+	}
+	out := &Resolved{
+		Vendor:      vendor,
+		Spec:        spec,
+		Cataloged:   cataloged,
+		BaseURL:     baseURL,
+		RemoteModel: ref.Model,
+		RerankAPI:   protocol,
+		Rerank:      settings,
+	}
+	if override := strings.TrimSpace(ref.Extra[ExtraRemoteModelName]); override != "" {
+		out.RemoteModel = override
+	}
+	return out, nil
 }

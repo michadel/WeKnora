@@ -135,6 +135,40 @@ func (e Endpoint) Do(req *http.Request) (*http.Response, error) {
 	return resp, nil
 }
 
+// PostJSON sends one authenticated JSON request and decodes the reply into
+// out. It is the whole round-trip for the non-streaming protocols (rerank,
+// embeddings), which have no SSE to assemble.
+//
+// It never returns a nil error with nothing decoded: every failure path —
+// marshalling, SSRF, transport, non-2xx, decoding — returns an error, so a
+// caller cannot mistake an empty result for a successful empty answer.
+func (e Endpoint) PostJSON(ctx context.Context, url string, body, out any) error {
+	req, _, err := e.NewRequest(ctx, url, body, false)
+	if err != nil {
+		return err
+	}
+	// No LogRequest here: the chat protocols log their own bodies because a
+	// prompt is what an operator debugs, while a rerank body is a query plus
+	// every candidate chunk. The rerank layer logs a truncated line at Debug
+	// instead, so this would have duplicated it at Info.
+	resp, err := e.Do(req)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = resp.Body.Close() }()
+	raw, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read response: %w", err)
+	}
+	if out == nil {
+		return nil
+	}
+	if err := json.Unmarshal(raw, out); err != nil {
+		return fmt.Errorf("decode response: %w", err)
+	}
+	return nil
+}
+
 // HTTPError is a non-2xx vendor reply.
 type HTTPError struct {
 	StatusCode int
