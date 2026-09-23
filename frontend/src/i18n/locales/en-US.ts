@@ -226,6 +226,7 @@ export default {
     deleteSession: 'Delete Conversation',
     renamePlaceholder: 'Enter a conversation title',
     unpinSuccess: 'Conversation unpinned',
+    temporaryWorkspace: 'Temporary workspace',
     sessionIdCopied: 'Session ID copied',
     linkCopied: 'Conversation link copied',
     copyFailed: 'Copy failed. Check your browser clipboard permission.',
@@ -2776,6 +2777,9 @@ export default {
   createChat: {
     title: 'Hi, I am WeKnora — your knowledge, within reach',
     newSessionTitle: 'New Session',
+    openProject: 'Select project',
+    clearProject: 'Clear',
+    pickFailed: 'Could not open the selected path',
     messages: {
       createFailed: 'Failed to create session',
       createError: 'Failed to create session, please try again later'
