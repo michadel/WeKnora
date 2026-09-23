@@ -2913,7 +2913,7 @@ const handleKBEditorSuccess = (kbIdValue: string) => {
   height: 32px;
   padding: 0 10px;
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--app-radius-sm);
   background: transparent;
   color: var(--td-text-color-primary);
   font-family: var(--app-font-family);

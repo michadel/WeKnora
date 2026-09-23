@@ -18,6 +18,8 @@ import (
 	"strings"
 	"time"
 
+	modelruntime "github.com/Tencent/WeKnora/internal/models/runtime"
+
 	sqlite_vec "github.com/asg017/sqlite-vec-go-bindings/cgo"
 	_ "github.com/duckdb/duckdb-go/v2"
 	esv7 "github.com/elastic/go-elasticsearch/v7"
@@ -86,11 +88,9 @@ import (
 	"github.com/Tencent/WeKnora/internal/mcp"
 	"github.com/Tencent/WeKnora/internal/mcpserver"
 	"github.com/Tencent/WeKnora/internal/models/api"
-	"github.com/Tencent/WeKnora/internal/models/catalog"
 	"github.com/Tencent/WeKnora/internal/models/embedding"
-	"github.com/Tencent/WeKnora/internal/models/limiter"
+	"github.com/Tencent/WeKnora/internal/models/limiter" // register built-in vendors
 	"github.com/Tencent/WeKnora/internal/models/utils/ollama"
-	_ "github.com/Tencent/WeKnora/internal/models/vendors" // register built-in vendors
 	"github.com/Tencent/WeKnora/internal/router"
 	"github.com/Tencent/WeKnora/internal/sandbox"
 	"github.com/Tencent/WeKnora/internal/storageallowlist"
@@ -115,9 +115,8 @@ import (
 //   - Configured container with all application dependencies registered
 func BuildContainer(container *dig.Container) *dig.Container {
 	// Deployment-level model catalog overlay (config/models.json, optional).
-	// Built-in vendors register themselves through the vendors package
-	// import; the overlay may add vendors or patch built-in ones.
-	if err := catalog.LoadOverlay(config.ConfigDir()); err != nil {
+	// Register providers explicitly, then validate and publish one catalog generation.
+	if err := modelruntime.Initialize(config.ConfigDir()); err != nil {
 		logger.Warnf(context.Background(), "Load models catalog overlay failed: %v", err)
 	}
 	ctx := context.Background()
@@ -914,7 +913,7 @@ func initDatabase(cfg *config.Config) (*gorm.DB, error) {
 		// Post-migration: declarative built-in models from config/builtin_models.yaml (optional).
 		// The loader validates each row's catalog parameters through this hook;
 		// the wiring lives here because internal/types cannot import the catalog.
-		types.ValidateModelParameters = catalog.ValidateRow
+		types.ValidateModelParameters = modelruntime.ValidateRow
 		if err := types.LoadBuiltinModelsConfig(context.Background(), db, config.ConfigDir()); err != nil {
 			logger.Warnf(context.Background(), "Load builtin models config failed: %v", err)
 		}

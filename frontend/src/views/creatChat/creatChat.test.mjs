@@ -22,4 +22,3 @@ test('new-session page has a single project button flush above the composer', ()
   assert.doesNotMatch(source, /t-select/)
   assert.doesNotMatch(source, /project-dir-picker/)
 })
-
