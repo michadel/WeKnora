@@ -38,8 +38,9 @@ async function fixture(options: {
   const saves: any[] = []
   const resolves: any[] = []
   const providers: any[] = options.providers || []
+  const catalogEvents: string[] = []
   const providersStore = {
-    ensureLoaded: async () => providers,
+    ensureLoaded: async (_type?: string, force?: boolean) => { catalogEvents.push(force ? 'refresh' : 'load'); return providers },
     providersFor: () => providers,
     isLoading: () => false,
     providerById: (id: string) => providers.find((p) => p.value === id),
@@ -113,7 +114,7 @@ async function fixture(options: {
   Object.assign(vm.formData, { modelName: 'draft-model', baseUrl: 'https://example.com/v1', apiKey: options.edit ? '' : 'draft-key' })
   vm.formRef = { validate: async () => true }
   await nextTick()
-  return { vm, props, requests, saves, toasts, visibility, resolves, close: () => app.unmount() }
+  return { vm, props, requests, saves, toasts, visibility, resolves, catalogEvents, close: () => app.unmount() }
 }
 
 for (const type of ['chat', 'embedding', 'rerank', 'vllm', 'asr']) {
@@ -955,5 +956,18 @@ test('capability preview includes the same edited spec as connection tests', asy
     f.vm.formData.specCompat = '{"supports_temperature": false}'
     await f.vm.runResolve()
     assert.deepEqual(plain(f.resolves.at(-1).spec), { api: 'openai-completions', compat: { supports_temperature: false } })
+  } finally { f.close() }
+})
+
+test('opening the model editor refreshes its catalog candidates', async () => {
+  const f = await fixture()
+  try {
+    assert.equal(f.catalogEvents[0], 'refresh')
+    f.props.visible = false
+    await nextTick()
+    f.catalogEvents.length = 0
+    f.props.visible = true
+    await nextTick()
+    assert.equal(f.catalogEvents[0], 'refresh')
   } finally { f.close() }
 })
