@@ -1,4 +1,4 @@
-.PHONY: help build run test clean docker-build-app docker-build-docreader docker-build-frontend docker-build-all docker-run migrate-up migrate-down docker-restart docker-stop start-all stop-all start-ollama stop-ollama build-images build-images-app build-images-docreader build-images-frontend clean-images check-env list-containers pull-images show-platform dev-start dev-stop dev-restart dev-logs dev-status dev-app dev-frontend docs install-swagger build-lite run-lite package-lite anydoc-lib build-anydoc
+.PHONY: help build run test clean docker-build-app docker-build-docreader docker-build-frontend docker-build-all runDebugAll docker-run migrate-up migrate-down docker-restart docker-stop start-all stop-all start-ollama stop-ollama build-images build-images-app build-images-docreader build-images-frontend clean-images check-env list-containers pull-images show-platform dev-start dev-stop dev-restart dev-logs dev-status dev-app dev-frontend docs install-swagger build-lite run-lite package-lite anydoc-lib build-anydoc
 
 # Show help
 help:
@@ -155,10 +155,42 @@ docker-build-frontend:
 	@eval $$(./scripts/get_version.sh env); \
 	docker build --platform $(PLATFORM) \
 		--build-arg VITE_FRONTEND_COMMIT="$$COMMIT_ID" \
+		--build-arg VITE_FRONTEND_BUILD_TIME="$$BUILD_TIME" \
 		-f frontend/Dockerfile -t wechatopenai/weknora-ui:latest frontend/
 
 # Build all Docker images
 docker-build-all: docker-build-app docker-build-docreader docker-build-frontend
+
+# Build all services with buildx cache (for local development/debugging)
+runDebugAll:
+	@echo "=== 使用 buildx 構建所有服務（啟用緩存） ==="
+	@mkdir -p /Users/michael/.docker/buildkit/cache/app
+	@mkdir -p /Users/michael/.docker/buildkit/cache/frontend
+	@echo "=== 構建 app 服務 ==="
+	@eval $$(./scripts/get_version.sh env); \
+	./scripts/get_version.sh info; \
+	DOCKER_BUILDKIT=1 docker buildx build --builder=weknora \
+		--platform $(PLATFORM) \
+		--build-arg VERSION_ARG="$$VERSION" \
+		--build-arg COMMIT_ID_ARG="$$COMMIT_ID" \
+		--build-arg BUILD_TIME_ARG="$$BUILD_TIME" \
+		--build-arg GO_VERSION_ARG="$$GO_VERSION" \
+		--build-arg WITH_ANYDOC=$${WITH_ANYDOC:-1} \
+		--cache-to=type=local,dest=/Users/michael/.docker/buildkit/cache/app,mode=inline \
+		--cache-from=type=local,src=/Users/michael/.docker/buildkit/cache/app \
+		-t $(DOCKER_IMAGE):$(DOCKER_TAG) \
+		-f docker/Dockerfile.app .
+	@echo "=== 構建 frontend 服務 ==="
+	@eval $$(./scripts/get_version.sh env); \
+	DOCKER_BUILDKIT=1 docker buildx build --builder=weknora \
+		--platform $(PLATFORM) \
+		--build-arg VITE_FRONTEND_COMMIT="$$COMMIT_ID" \
+		--build-arg VITE_FRONTEND_BUILD_TIME="$$BUILD_TIME" \
+		--cache-to=type=local,dest=/Users/michael/.docker/buildkit/cache/frontend,mode=inline \
+		--cache-from=type=local,src=/Users/michael/.docker/buildkit/cache/frontend \
+		-t wechatopenai/weknora-ui:latest \
+		-f frontend/Dockerfile frontend/
+	@echo "=== 所有服務構建完成 ==="
 
 # Run Docker container (传统方式)
 # Touch .env if missing — docker-compose.yml's `env_file: [.env]` is required

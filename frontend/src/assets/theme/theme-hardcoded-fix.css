@@ -5,6 +5,22 @@
  * 在 Yuta 主題下不會自動切換。此檔案用 CSS 變數覆蓋它們。
  * ============================================================ */
 
+/* ---- Sidebar menu icons: green variants use filter to match theme ---- */
+/* The -green.svg files have hardcoded #07C05F. We use CSS filter to recolor them. */
+/* Light theme: no filter needed (default is already #07C05F) */
+/* Yuta theme: use filter to convert #07C05F green to #0067B3 blue */
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="prefixIcon-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="agent-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="artifact-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="toolbox-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="organization-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="setting-green"],
+:root[theme-mode="yuta"] .aside_box .menu_icon img.icon[src*="search-green"] {
+  /* Filter to convert #07C05F to #0067B3 */
+  filter: hue-rotate(195deg) saturate(1.5) brightness(0.85);
+}
+
 /* ---- EmbedInputField.vue: active tab background ---- */
 .embed-tabs-list .embed-tab-item.active {
   background: color-mix(in srgb, var(--td-brand-color) 12%, transparent);

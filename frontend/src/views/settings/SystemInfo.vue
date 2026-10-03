@@ -68,6 +68,17 @@
         </div>
       </div>
 
+      <!-- Frontend build time -->
+      <div v-if="frontendBuildTime && frontendBuildTime !== 'unknown'" class="setting-row">
+        <div class="setting-info">
+          <label>{{ $t('system.frontendBuildTimeLabel') }}</label>
+          <p class="desc">{{ $t('system.frontendBuildTimeDescription') }}</p>
+        </div>
+        <div class="setting-control">
+          <span class="info-value">{{ frontendBuildTime }}</span>
+        </div>
+      </div>
+
       <!-- Build time -->
       <div v-if="systemInfo?.build_time" class="setting-row">
         <div class="setting-info">
@@ -210,6 +221,7 @@ const loading = ref(true)
 const error = ref('')
 const frontendVersion = __FRONTEND_VERSION__
 const frontendCommit = __FRONTEND_COMMIT__
+const frontendBuildTime = __FRONTEND_BUILD_TIME__
 
 let uptimeTicker: ReturnType<typeof setInterval> | null = null
 const uptimeTick = ref(0)

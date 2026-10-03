@@ -27,7 +27,29 @@ function resolveFrontendCommit(): string {
   }
 }
 
+function resolveBuildTime(): string {
+  const fromEnv = process.env.VITE_FRONTEND_BUILD_TIME
+  if (fromEnv && fromEnv !== 'unknown') {
+    // Accept both "yyyymmdd.hh24mi" and "YYYY-MM-DD HH:MM:SS UTC" formats
+    const m = fromEnv.match(/^(\d{4})(\d{2})(\d{2})\.(\d{2})(\d{2})$/)
+    if (m) {
+      return fromEnv // already in yyyyMMdd.HHmm
+    }
+    // Parse "YYYY-MM-DD HH:MM:SS UTC" or similar
+    const parsed = new Date(fromEnv.replace(' UTC', '').trim())
+    if (!isNaN(parsed.getTime())) {
+      const pad = (n: number) => String(n).padStart(2, '0')
+      return `${parsed.getFullYear()}${pad(parsed.getMonth() + 1)}${pad(parsed.getDate())}.${pad(parsed.getHours())}${pad(parsed.getMinutes())}`
+    }
+  }
+  // Fallback: current time in yyyyMMdd.HHmm format
+  const now = new Date()
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}.${pad(now.getHours())}${pad(now.getMinutes())}`
+}
+
 const FRONTEND_COMMIT = resolveFrontendCommit()
+const BUILD_TIME = resolveBuildTime()
 
 /** Dev parity with nginx: serve embed.html for /embed/:channelId (not the main SPA). */
 function embedHtmlDevFallback(): Plugin {
@@ -71,6 +93,7 @@ export default defineConfig({
   define: {
     __FRONTEND_VERSION__: JSON.stringify(FRONTEND_VERSION),
     __FRONTEND_COMMIT__: JSON.stringify(FRONTEND_COMMIT),
+    __FRONTEND_BUILD_TIME__: JSON.stringify(BUILD_TIME),
   },
   build: {
     modulePreload: {

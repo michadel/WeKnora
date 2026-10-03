@@ -327,8 +327,7 @@
                 <div class="bottom-right">
                   <t-tooltip :content="kb.org_name" placement="top">
                     <div class="org-source">
-                      <img src="@/assets/img/organization-green.svg" class="org-source-icon" alt=""
-                        aria-hidden="true" />
+                      <SvgIcon name="organization-green.svg" class="org-source-icon" aria-hidden="true" />
                       <span>{{ kb.org_name }}</span>
                     </div>
                   </t-tooltip>
@@ -664,8 +663,7 @@
                 <span class="shared-detail-label">{{ currentSharedKbForDetail.source_from_agent ?
                   $t('knowledgeList.detail.sourceFromAgent') : $t('knowledgeList.detail.sourceOrg') }}</span>
                 <span class="shared-detail-value shared-detail-org">
-                  <img src="@/assets/img/organization-green.svg" class="shared-detail-org-icon" alt=""
-                    aria-hidden="true" />
+                  <SvgIcon name="organization-green.svg" class="shared-detail-org-icon" aria-hidden="true" />
                   {{ currentSharedKbForDetail.source_from_agent ? currentSharedKbForDetail.source_from_agent.agent_name
                     :
                     currentSharedKbForDetail.org_name }}
@@ -718,6 +716,7 @@ import { deleteKnowledgeBase, duplicateKnowledgeBase, togglePinKnowledgeBase } f
 import { useChatResourcesStore } from '@/stores/chatResources'
 import { formatStringDate } from '@/utils/index'
 import { useUIStore } from '@/stores/ui'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useOrganizationStore } from '@/stores/organization'
 import { listOrganizationSharedKnowledgeBases, type SharedKnowledgeBase, type OrganizationSharedKnowledgeBaseItem, type SourceFromAgentInfo } from '@/api/organization'

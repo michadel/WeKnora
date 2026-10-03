@@ -231,6 +231,10 @@ type SearchResult struct {
 	// longer describe the body. Internal only: used by the merge pipeline,
 	// never serialized.
 	ContentRewritten bool `json:"-"`
+
+	// CitationSources is the list of citation source documents for this result.
+	// Populated by the citation pipeline for rich citation navigation.
+	CitationSources []*SearchResult `json:"citation_sources,omitempty"`
 }
 
 // SearchParams represents the search parameters

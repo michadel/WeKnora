@@ -33,6 +33,7 @@ import { useEditorResourcesStore } from '@/stores/editorResources';
 import { useDeploymentCapabilitiesStore } from '@/stores/deploymentCapabilities';
 import { hostSkillsOnly, mentionSkillTargetId } from '@/utils/skillTarget';
 import { useI18n } from 'vue-i18n';
+import SvgIcon from '@/components/SvgIcon.vue';
 import AttachmentUpload, { type AttachmentFile } from './AttachmentUpload.vue';
 import {
   kbSatisfiesAgentRequirements,
@@ -2742,8 +2743,8 @@ defineExpose({
               <t-icon v-else :name="getMentionIcon(item)" />
             </span>
             <span v-if="item.org_name" class="mention-chip__org-badge">
-              <img :src="getImgSrc(item.type === 'file' ? 'organization-grey.svg' : 'organization-green.svg')"
-                class="mention-chip__org-img" alt="" aria-hidden="true" />
+              <SvgIcon :name="item.type === 'file' ? 'organization-grey.svg' : 'organization-green.svg'"
+                class="mention-chip__org-img" aria-hidden="true" />
             </span>
           </span>
           <span class="mention-chip__name" :title="item.name">{{ item.name }}</span>

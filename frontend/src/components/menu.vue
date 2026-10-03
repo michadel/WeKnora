@@ -16,7 +16,7 @@
                     </template>
                     <div class="header-icon-btn" @click="commandPaletteStore.openPalette('')"
                         :aria-label="t('menu.search')">
-                        <img class="header-icon-img" :src="getImgSrc('search.svg')" alt="">
+                        <SvgIcon name="search.svg" />
                     </div>
                 </t-tooltip>
                 <div class="sidebar-toggle" @click="uiStore.toggleSidebar" :title="t('menu.collapseSidebar')">
@@ -72,7 +72,7 @@
                     <div class="menu_item menu_item--cmdk" @click="commandPaletteStore.openPalette('')">
                         <div class="menu_item-box">
                             <div class="menu_icon">
-                                <img class="icon" :src="getImgSrc('search.svg')" alt="">
+                                <SvgIcon name="search.svg" />
                             </div>
                         </div>
                     </div>
@@ -86,9 +86,7 @@
                         :class="['menu_item', item.childrenPath && item.childrenPath == currentpath ? 'menu_item_c_active' : isMenuItemActive(item.path) ? 'menu_item_active' : '']">
                         <div class="menu_item-box">
                             <div class="menu_icon">
-                                <img class="icon"
-                                    :src="getImgSrc(item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'agent' ? agentIcon : item.icon == 'artifact' ? artifactIcon : item.icon == 'toolbox' ? toolboxIcon : item.icon == 'organization' ? organizationIcon : item.icon == 'logout' ? logoutIcon : item.icon == 'setting' ? settingIcon : prefixIcon)"
-                                    alt="">
+                                <SvgIcon :name="item.icon == 'zhishiku' ? knowledgeIcon : item.icon == 'agent' ? agentIcon : item.icon == 'artifact' ? artifactIcon : item.icon == 'toolbox' ? toolboxIcon : item.icon == 'organization' ? organizationIcon : item.icon == 'logout' ? logoutIcon : item.icon == 'setting' ? settingIcon : prefixIcon" />
                             </div>
                             <template v-if="!uiStore.sidebarCollapsed">
                                 <span class="menu_title" :title="item.title">{{ item.title }}</span>
@@ -278,6 +276,7 @@ import UserMenu from '@/components/UserMenu.vue';
 import TenantSelector from '@/components/TenantSelector.vue';
 import { useI18n } from 'vue-i18n';
 import { useEditorResourcesStore } from '@/stores/editorResources';
+import SvgIcon from '@/components/SvgIcon.vue';
 
 const chatResources = useChatResourcesStore();
 const editorResources = useEditorResourcesStore();
