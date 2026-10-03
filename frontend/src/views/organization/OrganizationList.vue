@@ -20,8 +20,7 @@
               <t-tooltip :content="canManageOrg ? $t('organization.createOrg') : noPermissionTip" placement="bottom">
                 <t-button variant="text" theme="default" size="small" class="header-action-btn"
                   style="--wails-draggable: no-drag" :disabled="!canManageOrg" @click="handleCreateOrganization">
-                  <template #icon><img src="@/assets/img/organization-green.svg" class="org-create-icon" alt=""
-                      aria-hidden="true" /></template>
+                  <template #icon><SvgIcon name="organization-green.svg" class="org-create-icon" aria-hidden="true" /></template>
                 {{ $t('organization.createOrg') }}
                 </t-button>
               </t-tooltip>
@@ -146,7 +145,7 @@
                   </t-tooltip>
                   <t-tooltip :content="$t('organization.invite.agents')" placement="top">
                     <div class="feature-badge stat-agent">
-                      <img src="@/assets/img/agent-green.svg" class="stat-agent-icon" alt="" aria-hidden="true" />
+                      <SvgIcon name="agent-green.svg" class="stat-agent-icon" aria-hidden="true" />
                       <span class="badge-count">{{ org.agent_share_count ?? 0 }}</span>
                     </div>
                   </t-tooltip>
@@ -183,8 +182,7 @@
           </t-tooltip>
           <t-tooltip :content="noPermissionTip" placement="top" :disabled="canManageOrg">
             <t-button theme="primary" class="org-create-btn" :disabled="!canManageOrg" @click="handleCreateOrganization">
-              <template #icon><img src="@/assets/img/organization-green.svg" class="org-create-icon" alt=""
-                  aria-hidden="true" /></template>
+              <template #icon><SvgIcon name="organization-green.svg" class="org-create-icon" aria-hidden="true" /></template>
               {{ $t('organization.createOrg') }}
             </t-button>
           </t-tooltip>
@@ -358,7 +356,7 @@
                       </t-tooltip>
                       <t-tooltip :content="$t('organization.invite.agents')" placement="top">
                         <div class="feature-badge stat-agent">
-                          <img src="@/assets/img/agent-green.svg" class="stat-agent-icon" alt="" aria-hidden="true" />
+                          <SvgIcon name="agent-green.svg" class="stat-agent-icon" aria-hidden="true" />
                           <span class="badge-count">{{ invitePreviewData.agent_share_count ?? 0 }}</span>
                         </div>
                       </t-tooltip>
@@ -442,6 +440,7 @@ import { useAuthStore } from '@/stores/auth'
 import type { Organization, OrganizationPreview, SearchableOrganizationItem } from '@/api/organization'
 import { previewOrganization, submitJoinRequest } from '@/api/organization'
 import { useI18n } from 'vue-i18n'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { copyWithToast } from '@/utils/clipboard'
 import OrganizationSettingsModal from './OrganizationSettingsModal.vue'
 import SpaceAvatar from '@/components/SpaceAvatar.vue'

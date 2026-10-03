@@ -89,7 +89,7 @@
                     {{ $t('mentionDetail.kbCount', { count: detailCache[item.id].data.knowledge_count ?? detailCache[item.id].data.count ?? 0 }) }}
                   </span>
                   <span v-if="detailCache[item.id].data.org_name || item.orgName" class="detail-org">
-                    <img src="@/assets/img/organization-green.svg" class="detail-icon-img" alt="" aria-hidden="true" />
+                    <SvgIcon name="organization-green.svg" class="detail-icon-img" aria-hidden="true" />
                     <span class="detail-label">{{ $t('mentionDetail.belongsToOrg') }}</span>
                     <span
                       class="detail-value clickable"
@@ -246,7 +246,7 @@
                     </span>
                   </span>
                   <span v-if="item.orgName" class="detail-org">
-                    <img src="@/assets/img/organization-green.svg" class="detail-icon-img" alt="" aria-hidden="true" />
+                    <SvgIcon name="organization-green.svg" class="detail-icon-img" aria-hidden="true" />
                     <span class="detail-label">{{ $t('mentionDetail.belongsToOrg') }}</span>
                     <span
                       class="detail-value clickable"
@@ -283,6 +283,7 @@ import { getKnowledgeDetails } from '@/api/knowledge-base';
 import { useOrganizationStore } from '@/stores/organization';
 import { useSettingsStore } from '@/stores/settings';
 import { SKILL_ICON, type MentionItem, type MentionItemType } from '@/types/mention';
+import SvgIcon from '@/components/SvgIcon.vue';
 
 type DetailState = { loading: boolean; error?: string; data?: any };
 

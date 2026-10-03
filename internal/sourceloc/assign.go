@@ -1,7 +1,6 @@
 package sourceloc
 
 import (
-	"html"
 	"regexp"
 	"sort"
 	"strings"
@@ -9,6 +8,10 @@ import (
 
 	"github.com/Tencent/WeKnora/internal/types"
 )
+
+// MaxLocatorsPerChunk caps how many locators one chunk (or merged search
+// result) carries.
+const MaxLocatorsPerChunk = 64
 
 // Index answers "which source positions does this range of the final
 // Markdown cover" for the chunker's output.
@@ -48,18 +51,13 @@ func (x *Index) Locators(start, end int) types.SourceLocators {
 	// Blocks before i all end at or before start.
 	i := sort.Search(len(x.blocks), func(k int) bool { return x.maxEnd[k] > start })
 	var out types.SourceLocators
-	covered, partial := start, false
 	for ; i < len(x.blocks) && x.blocks[i].Start < end; i++ {
 		b := x.blocks[i]
 		lo, hi := max(b.Start, start), min(b.End, end)
 		if hi <= lo {
 			continue
 		}
-		if lo > covered && normalizeMarkdown(fullQuote(string(x.runes[covered:lo]))).text != "" {
-			partial = true
-		}
-		covered = max(covered, hi)
-		quote := fullQuote(string(x.runes[lo:hi]))
+		quote := CleanQuote(string(x.runes[lo:hi]))
 		if quote == "" && b.Locator.Type != types.SourceLocatorPDF {
 			continue
 		}
@@ -68,13 +66,8 @@ func (x *Index) Locators(start, end int) types.SourceLocators {
 		loc.Quote = quote
 		out = AppendLocator(out, loc)
 	}
-	if covered < end && normalizeMarkdown(fullQuote(string(x.runes[covered:end]))).text != "" {
-		partial = true
-	}
-	if partial {
-		for i := range out {
-			out[i].Partial = true
-		}
+	if len(out) > MaxLocatorsPerChunk {
+		out = out[:MaxLocatorsPerChunk]
 	}
 	return out
 }
@@ -108,11 +101,7 @@ func AppendLocator(list types.SourceLocators, loc types.SourceLocator) types.Sou
 }
 
 func foldInto(last *types.SourceLocator, loc types.SourceLocator) bool {
-	if last.Type != loc.Type ||
-		last.Partial != loc.Partial ||
-		last.Mapping != loc.Mapping ||
-		last.SourceHash != loc.SourceHash ||
-		last.SourceID != loc.SourceID {
+	if last.Type != loc.Type {
 		return false
 	}
 	switch loc.Type {
@@ -169,19 +158,14 @@ func MergeLocators(a, b types.SourceLocators) types.SourceLocators {
 			out = append(out, loc)
 		}
 	}
+	if len(out) > MaxLocatorsPerChunk {
+		out = out[:MaxLocatorsPerChunk]
+	}
 	return out
 }
 
 func sameLocator(a, b types.SourceLocator) bool {
-	if a.Partial != b.Partial ||
-		a.Quote != b.Quote ||
-		a.SourceID != b.SourceID ||
-		a.SourceHash != b.SourceHash ||
-		a.Mapping != b.Mapping ||
-		a.Type != b.Type ||
-		a.Page != b.Page ||
-		a.Block != b.Block ||
-		a.Slide != b.Slide ||
+	if a.Type != b.Type || a.Page != b.Page || a.Block != b.Block || a.Slide != b.Slide ||
 		a.Sheet != b.Sheet || a.RowStart != b.RowStart || a.RowEnd != b.RowEnd ||
 		a.Start != b.Start || a.End != b.End || a.StartMs != b.StartMs || a.EndMs != b.EndMs ||
 		a.Section != b.Section || len(a.BBox) != len(b.BBox) {
@@ -206,27 +190,21 @@ var (
 // text, collapses whitespace, and caps it at types.SourceLocatorQuoteMax
 // runes.
 func CleanQuote(text string) string {
-	return capRunes(fullQuote(text), types.SourceLocatorQuoteMax)
-}
-
-// fullQuote keeps the complete evidence; truncation can hide a citation near its end.
-func fullQuote(text string) string {
 	text = quoteImageRe.ReplaceAllString(text, " ")
 	text = quoteLinkRe.ReplaceAllString(text, "$1")
 	text = quoteTagRe.ReplaceAllString(text, " ")
-	text = html.UnescapeString(text)
 	text = strings.TrimSpace(quoteSpaceRe.ReplaceAllString(text, " "))
-	return text
+	return capRunes(text, types.SourceLocatorQuoteMax)
 }
 
 func joinQuote(a, b string) string {
 	if a == "" {
 		return b
 	}
-	if b == "" {
+	if b == "" || utf8.RuneCountInString(a) >= types.SourceLocatorQuoteMax {
 		return a
 	}
-	return a + " " + b
+	return capRunes(a+" "+b, types.SourceLocatorQuoteMax)
 }
 
 func capRunes(s string, n int) string {

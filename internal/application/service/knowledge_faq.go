@@ -1862,7 +1862,7 @@ func sanitizeFAQEntryPayload(payload *types.FAQEntryPayload) (*types.FAQChunkMet
 		Version:           1,
 		Source:            "faq",
 	}
-	meta.Sanitize()
+	meta.Normalize()
 	if meta.StandardQuestion == "" {
 		return nil, werrors.NewBadRequestError("标准问不能为空")
 	}

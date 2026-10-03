@@ -149,8 +149,6 @@ func (st SearchTargets) ContainsKB(kbID string) bool {
 
 // SearchResult represents the search result
 type SearchResult struct {
-	// CitationSources retains independently citeable bodies after context expansion.
-	CitationSources []*SearchResult `json:"-" gorm:"-"`
 	// ID
 	ID string `gorm:"column:id"              json:"id"`
 	// Content
@@ -233,6 +231,10 @@ type SearchResult struct {
 	// longer describe the body. Internal only: used by the merge pipeline,
 	// never serialized.
 	ContentRewritten bool `json:"-"`
+
+	// CitationSources is the list of citation source documents for this result.
+	// Populated by the citation pipeline for rich citation navigation.
+	CitationSources []*SearchResult `json:"citation_sources,omitempty"`
 }
 
 // SearchParams represents the search parameters

@@ -17,15 +17,13 @@ type App struct {
 	apiLanBaseURL string
 	listenPublic  bool
 	shutdownCh    chan struct{}
-	shutdownDone  chan struct{}
 	pickingDir    atomic.Bool
 }
 
 // NewApp creates a new App application struct.
 func NewApp() *App {
 	return &App{
-		shutdownCh:   make(chan struct{}, 1),
-		shutdownDone: make(chan struct{}),
+		shutdownCh: make(chan struct{}, 1),
 	}
 }
 
@@ -35,11 +33,7 @@ func (a *App) startup(ctx context.Context) {
 }
 
 func (a *App) shutdown(ctx context.Context) {
-	select {
-	case a.shutdownCh <- struct{}{}:
-	default:
-	}
-	<-a.shutdownDone
+	a.shutdownCh <- struct{}{}
 }
 
 // GetAPIBaseURL returns the local HTTP base URL for REST API calls (e.g. http://127.0.0.1:PORT/api/v1).

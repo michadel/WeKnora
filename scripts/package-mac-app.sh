@@ -51,7 +51,7 @@ fi
 
 # 使用 Wails 打包 (需要先处理依赖代理问题)
 export GONOSUMDB="git.sr.ht/*"
-export GOPROXY="https://goproxy.cn,direct"
+export GOPROXY="https://proxy.golang.org,direct"
 export CGO_CFLAGS="-Wno-deprecated-declarations"
 export CGO_LDFLAGS="-Wl,-no_warn_duplicate_libraries"
 export EDITION=lite

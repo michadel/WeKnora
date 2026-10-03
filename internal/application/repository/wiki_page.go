@@ -1305,10 +1305,14 @@ func (r *wikiPageRepository) DeleteIssuesByKnowledgeBaseID(
 
 // escapeLikePattern escapes LIKE / ILIKE metacharacters so the returned string
 // can be safely concatenated with % wildcards without unintended matches.
-// It is a thin alias for escapeLikeKeyword, which owns the (order-sensitive)
-// escaping rules; both must stay paired with an explicit ESCAPE clause.
+// Order matters: escape the backslash first, then the wildcards.
 func escapeLikePattern(s string) string {
-	return escapeLikeKeyword(s)
+	replacer := strings.NewReplacer(
+		`\`, `\\`,
+		`%`, `\%`,
+		`_`, `\_`,
+	)
+	return replacer.Replace(s)
 }
 
 // Search performs full-text search on wiki pages within a knowledge base.

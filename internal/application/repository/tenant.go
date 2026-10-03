@@ -83,16 +83,12 @@ func (r *tenantRepository) SearchTenants(ctx context.Context, keyword string, te
 	// Build search conditions
 	if tenantID > 0 && keyword != "" {
 		escaped := escapeLikeKeyword(keyword)
-		query = query.Where(
-			"id = ? OR name LIKE ? ESCAPE ? OR description LIKE ? ESCAPE ?",
-			tenantID, "%"+escaped+"%", likeEscapeChar, "%"+escaped+"%", likeEscapeChar)
+		query = query.Where("id = ? OR name LIKE ? OR description LIKE ?", tenantID, "%"+escaped+"%", "%"+escaped+"%")
 	} else if tenantID > 0 {
 		query = query.Where("id = ?", tenantID)
 	} else if keyword != "" {
 		escaped := escapeLikeKeyword(keyword)
-		query = query.Where(
-			"name LIKE ? ESCAPE ? OR description LIKE ? ESCAPE ?",
-			"%"+escaped+"%", likeEscapeChar, "%"+escaped+"%", likeEscapeChar)
+		query = query.Where("name LIKE ? OR description LIKE ?", "%"+escaped+"%", "%"+escaped+"%")
 	}
 
 	// Count total

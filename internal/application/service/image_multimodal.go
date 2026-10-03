@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -318,13 +317,11 @@ func (s *ImageMultimodalService) processImage(
 		logger.Errorf(ctx, "[ImageMultimodal] Skip unreadable image %s: %v", payload.ImageURL, readErr)
 		out["skipped"] = "unreadable_image"
 		out["read_error"] = readErr.Error()
-		handleErr = fmt.Errorf("read source image: %w", readErr)
-		return handleErr
+		return nil
 	}
 	out["image_bytes"] = len(imgBytes)
 
 	imageInfo := types.ImageInfo{
-		SHA256:      fmt.Sprintf("%x", sha256.Sum256(imgBytes)),
 		URL:         payload.ImageURL,
 		OriginalURL: payload.ImageURL,
 	}

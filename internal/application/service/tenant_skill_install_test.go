@@ -3324,10 +3324,6 @@ type installModelService struct {
 }
 
 func (s *installModelService) CreateModel(context.Context, *types.Model) error { return nil }
-func (s *installModelService) CopyModel(context.Context, string, string) (*types.Model, error) {
-	return nil, nil
-}
-
 func (s *installModelService) GetModelByID(context.Context, string) (*types.Model, error) {
 	return nil, nil
 }

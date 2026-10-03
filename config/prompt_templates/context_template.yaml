@@ -7,6 +7,9 @@ templates:
       zh-CN:
         name: "标准模板"
         description: "基础的上下文模板，清晰展示参考资料和问题"
+      zh-TW:
+        name: "標準模板"
+        description: "基礎的上下文模板，清晰展示參考資料和問題"
       en-US:
         name: "Standard Template"
         description: "Basic context template with clear references and questions"
@@ -35,6 +38,9 @@ templates:
       zh-CN:
         name: "详细模板"
         description: "包含详细说明和回答要求的完整模板"
+      zh-TW:
+        name: "詳細模板"
+        description: "包含詳細說明和回答要求的完整模板"
       en-US:
         name: "Detailed Template"
         description: "Complete template with detailed instructions and requirements"
@@ -63,6 +69,9 @@ templates:
       zh-CN:
         name: "简洁模板"
         description: "精简的模板格式，适合简单问答场景"
+      zh-TW:
+        name: "簡潔模板"
+        description: "精簡的模板格式，適合簡單問答場景"
       en-US:
         name: "Simple Template"
         description: "Minimal template format for simple Q&A scenarios"
@@ -86,6 +95,9 @@ templates:
       zh-CN:
         name: "问答模板"
         description: "针对问答场景优化的模板"
+      zh-TW:
+        name: "問答模板"
+        description: "針對問答場景優化的模板"
       en-US:
         name: "Q&A Template"
         description: "Optimized template for Q&A scenarios"

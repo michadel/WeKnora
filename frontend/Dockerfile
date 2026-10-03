@@ -36,16 +36,19 @@ ENV NODE_OPTIONS="--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}"
 
 # The lockfile pins the remote SheetJS archive and its integrity hash.
 COPY package.json package-lock.json ./
-RUN if [ -n "$NPM_REGISTRY" ]; then \
-      npm ci --registry="$NPM_REGISTRY"; \
-    else \
-      npm ci; \
-    fi
-
+RUN --mount=type=cache,target=/root/.npm \
+  if [ -n "$NPM_REGISTRY" ]; then \
+    npm ci --registry="$NPM_REGISTRY"; \
+  se \
+    npm ci; \
+  
+  
 COPY . .
 # After npm ci so a new commit hash does not bust the dependency layer.
 ARG VITE_FRONTEND_COMMIT=unknown
+ARG VITE_FRONTEND_BUILD_TIME=unknown
 ENV VITE_FRONTEND_COMMIT=${VITE_FRONTEND_COMMIT}
+ENV VITE_FRONTEND_BUILD_TIME=${VITE_FRONTEND_BUILD_TIME}
 RUN npm run build
 
 # ---------------------------------------------------------------------------

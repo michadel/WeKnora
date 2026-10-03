@@ -9,18 +9,6 @@
         role="complementary"
         :aria-label="panelTitle"
       >
-        <PanelResizeHandle
-          v-if="maxPanelWidth > minPanelWidth"
-          :key="sourceTarget ? 'source' : 'list'"
-          edge="left"
-          :label="t('knowledgeStages.resizeDrawer')"
-          :value="panelWidth"
-          :min="minPanelWidth"
-          :max="maxPanelWidth"
-          @start="resizeStartWidth = panelWidth"
-          @resize="resizePanel"
-          @end="savePanelWidths"
-        />
         <header class="chat-references-panel__header">
           <div class="chat-references-panel__heading">
             <button
@@ -184,7 +172,6 @@ import { useRouter } from 'vue-router'
 import { REFERENCES_PANEL_WIDTH, useChatReferencesDrawer } from '@/composables/useChatReferencesDrawer'
 import ArtifactFileIcon from '@/views/chat/components/ArtifactFileIcon.vue'
 import ChatReferenceSourceView from '@/components/ChatReferenceSourceView.vue'
-import PanelResizeHandle from '@/components/PanelResizeHandle.vue'
 import {
   buildReferenceSections,
   formatReferenceSnippet,
@@ -220,18 +207,14 @@ const onViewportResize = () => {
 onMounted(() => window.addEventListener('resize', onViewportResize))
 onBeforeUnmount(() => window.removeEventListener('resize', onViewportResize))
 
-const WIDTH_STORAGE_KEY = 'weknora.references-panel-widths'
-const preferredWidths = reactive<{ source?: number; list?: number }>({})
-let resizeStartWidth = 0
-onMounted(() => {
-  try {
-    const stored = JSON.parse(localStorage.getItem(WIDTH_STORAGE_KEY) || '{}')
-    for (const key of ['source', 'list'] as const) {
-      if (typeof stored?.[key] === 'number' && Number.isFinite(stored[key]) && stored[key] > 0) {
-        preferredWidths[key] = stored[key]
-      }
-    }
-  } catch { /* Storage can be unavailable in embedded/private contexts. */ }
+// Reading an original document needs more room than the source list.
+const panelWidth = computed(() => {
+  if (!sourceTarget.value) return REFERENCES_PANEL_WIDTH
+  return Math.max(480, Math.min(780, Math.round(viewportWidth.value * 0.46)))
+})
+
+watchEffect(() => {
+  if (drawer) drawer.panelWidth.value = panelWidth.value
 })
 
 const useOverlay = computed(() => {
@@ -239,32 +222,10 @@ const useOverlay = computed(() => {
   return viewportWidth.value < (props.overlayBreakpoint ?? 960)
 })
 
-const maxPanelWidth = computed(() => useOverlay.value
-  ? viewportWidth.value
-  : Math.min(1400, Math.max(360, viewportWidth.value - 560)))
-const minPanelWidth = computed(() => Math.min(sourceTarget.value ? 360 : 320, maxPanelWidth.value))
-const clampPanelWidth = (width: number) => Math.max(minPanelWidth.value, Math.min(maxPanelWidth.value, width))
-// Preserve independent preferences when switching between the list and original.
-const panelWidth = computed(() => {
-  const preferred = sourceTarget.value ? preferredWidths.source : preferredWidths.list
-  const initial = sourceTarget.value
-    ? (useOverlay.value ? 760 : Math.max(480, Math.min(780, Math.round(viewportWidth.value * 0.46))))
-    : REFERENCES_PANEL_WIDTH
-  return clampPanelWidth(preferred ?? initial)
+const panelStyle = computed(() => {
+  if (!sourceTarget.value) return undefined
+  return { width: useOverlay.value ? 'min(760px, 100vw)' : `${panelWidth.value}px` }
 })
-const panelStyle = computed(() => ({ width: `${panelWidth.value}px` }))
-
-watchEffect(() => {
-  if (drawer) drawer.panelWidth.value = panelWidth.value
-})
-
-function resizePanel(delta: number) {
-  preferredWidths[sourceTarget.value ? 'source' : 'list'] = clampPanelWidth(resizeStartWidth - delta)
-}
-
-function savePanelWidths() {
-  try { localStorage.setItem(WIDTH_STORAGE_KEY, JSON.stringify(preferredWidths)) } catch { /* Optional preference. */ }
-}
 
 function canOpenSource(item: ReferenceListItem) {
   return !props.embeddedMode && item.kind === 'document' && !!item.knowledgeId && !!item.chunkId

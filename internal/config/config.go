@@ -273,14 +273,13 @@ type AuditConfig struct {
 
 // AuthConfig governs the user authentication entry points.
 type AuthConfig struct {
-	// RegistrationMode controls public and invitation password registration.
+	// RegistrationMode controls who may call POST /auth/register.
 	//   "self_serve" (default) — anyone may register; a new tenant is
 	//                            auto-created and the registrant becomes
 	//                            its Owner. Preserves existing behaviour.
-	//   "invite_register"      — new users need a valid invitation link.
-	//   "invite_only"          — no password registration; invitations can
-	//                            only be accepted by existing accounts.
-	//                            Kept as the legacy disabled mode.
+	//   "invite_only"          — public registration is rejected; new
+	//                            users only enter through the invitation
+	//                            flow added in PR 3.
 	RegistrationMode string `yaml:"registration_mode" json:"registration_mode"`
 	// DefaultTenantMode controls public password-registration provisioning.
 	// create_personal preserves the historical one-user-one-workspace default;
@@ -294,13 +293,14 @@ type AuthConfig struct {
 const (
 	AuthRegistrationModeSelfServe       = "self_serve"
 	AuthRegistrationModeInviteOnly      = "invite_only"
-	AuthRegistrationModeInviteRegister  = "invite_register"
 	AuthDefaultTenantModeCreatePersonal = "create_personal"
 	AuthDefaultTenantModeTenantless     = "tenantless"
 )
 
-// IsInviteOnly identifies the legacy disabled-registration mode.
-// It does not identify the invite_register mode, which permits new accounts.
+// IsInviteOnly returns true when registration is gated behind invitations.
+// Treats nil receiver and empty/unknown values as "not invite-only" so the
+// default keeps current behaviour even if the section is missing from the
+// config file.
 func (c *AuthConfig) IsInviteOnly() bool {
 	if c == nil {
 		return false
@@ -638,11 +638,9 @@ func ValidateConfig(cfg *Config) error {
 
 	if cfg.Auth != nil {
 		mode := strings.TrimSpace(cfg.Auth.RegistrationMode)
-		if mode != "" && mode != AuthRegistrationModeSelfServe &&
-			mode != AuthRegistrationModeInviteOnly && mode != AuthRegistrationModeInviteRegister {
-			errs = append(errs, fmt.Sprintf("auth.registration_mode must be %q, %q or %q, got %q",
-				AuthRegistrationModeSelfServe, AuthRegistrationModeInviteOnly,
-				AuthRegistrationModeInviteRegister, mode))
+		if mode != "" && mode != AuthRegistrationModeSelfServe && mode != AuthRegistrationModeInviteOnly {
+			errs = append(errs, fmt.Sprintf("auth.registration_mode must be %q or %q, got %q",
+				AuthRegistrationModeSelfServe, AuthRegistrationModeInviteOnly, mode))
 		}
 
 		tenantMode := strings.TrimSpace(cfg.Auth.DefaultTenantMode)

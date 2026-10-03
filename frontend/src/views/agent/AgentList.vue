@@ -282,7 +282,7 @@
                 </div>
                 <!-- 右下角：内置 / 来源徽章 / 空间图标+名称 -->
                 <div v-if="!agent.isMine" class="card-bottom-source">
-                  <img src="@/assets/img/organization-green.svg" class="org-icon" alt="" aria-hidden="true" />
+                  <SvgIcon name="organization-green.svg" class="org-icon" aria-hidden="true" />
                   <span class="org-source-text">{{ agent.org_name }}</span>
                 </div>
                 <div v-else-if="showAgentBuiltinBadge(agent)" class="builtin-badge">
@@ -678,8 +678,7 @@
             <div class="shared-detail-row">
               <span class="shared-detail-label">{{ $t('knowledgeList.detail.sourceOrg') }}</span>
               <span class="shared-detail-value shared-detail-org">
-                <img src="@/assets/img/organization-green.svg" class="shared-detail-org-icon" alt=""
-                  aria-hidden="true" />
+                <SvgIcon name="organization-green.svg" class="shared-detail-org-icon" aria-hidden="true" />
                 <span>{{ currentSharedAgent.org_name }}</span>
               </span>
             </div>
@@ -746,6 +745,7 @@ import { useConfirmDelete } from '@/components/settings/useConfirmDelete'
 import { deleteAgent, copyAgent, type CustomAgent } from '@/api/agent'
 import { useChatResourcesStore } from '@/stores/chatResources'
 import { useI18n } from 'vue-i18n'
+import SvgIcon from '@/components/SvgIcon.vue'
 import { createSessions } from '@/api/chat/index'
 import { useOrganizationStore } from '@/stores/organization'
 import { setSharedAgentDisabledByMe, listOrganizationSharedAgents } from '@/api/organization'

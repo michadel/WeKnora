@@ -4,10 +4,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 function run(dir, script) {
-  const npmCLI = process.env.npm_execpath;
-  if (!npmCLI) throw new Error('Run the site build through npm so npm_execpath is available.');
-  const result = spawnSync(process.execPath, [npmCLI, 'run', script], { cwd: resolve(root, dir), stdio: 'inherit' });
-  if (result.error) throw new Error(`Could not run npm ${script}: ${result.error.message}`);
+  const result = spawnSync('npm', ['run', script], { cwd: resolve(root, dir), stdio: 'inherit' });
   if (result.status !== 0) process.exit(result.status || 1);
 }
 for (const dir of ['homepage', '.']) {

@@ -7,6 +7,9 @@ templates:
       zh-CN:
         name: "知识库问答助手"
         description: "基础的知识库问答模板，适用于大多数场景"
+      zh-TW:
+        name: "知識庫問答助手"
+        description: "基礎的知識庫問答模板，適用於大多數場景"
       en-US:
         name: "Knowledge Base Assistant"
         description: "Basic knowledge base Q&A template for most scenarios"
@@ -33,6 +36,9 @@ templates:
       zh-CN:
         name: "领域专家助手"
         description: "专业深入的解答风格，适合技术或专业领域"
+      zh-TW:
+        name: "領域專家助手"
+        description: "專業深入的解答風格，適合技術或專業領域"
       en-US:
         name: "Domain Expert"
         description: "Professional and in-depth answers for technical domains"
@@ -66,6 +72,9 @@ templates:
       zh-CN:
         name: "客服助手"
         description: "友善热情的服务风格，适合客户服务场景"
+      zh-TW:
+        name: "客服助手"
+        description: "友善熱情的服務風格，適合客戶服務場景"
       en-US:
         name: "Customer Service"
         description: "Friendly and warm service style for customer support"
@@ -99,6 +108,9 @@ templates:
       zh-CN:
         name: "技术支持"
         description: "专业的技术问题解答，包含代码示例"
+      zh-TW:
+        name: "技術支持"
+        description: "專業的技術問題解答，包含代碼示例"
       en-US:
         name: "Technical Support"
         description: "Professional technical problem solving with code examples"
@@ -133,6 +145,9 @@ templates:
       zh-CN:
         name: "通用对话"
         description: "不依赖知识库的通用对话助手"
+      zh-TW:
+        name: "通用對話"
+        description: "不依賴知識庫的通用對話助手"
       en-US:
         name: "General Chat"
         description: "General conversation assistant without knowledge base"
@@ -161,6 +176,9 @@ templates:
       zh-CN:
         name: "网络搜索助手"
         description: "结合网络搜索获取最新信息"
+      zh-TW:
+        name: "網絡搜索助手"
+        description: "結合網絡搜索獲取最新信息"
       en-US:
         name: "Web Search Assistant"
         description: "Combines web search for up-to-date information"

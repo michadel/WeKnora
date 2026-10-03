@@ -1,0 +1,11 @@
+# Local overrides for the upstream Makefile.
+# Include the shared Makefile first, then override only what you need.
+include Makefile
+
+# Build frontend Docker image with build timestamp (yyyymmdd.hh24mi)
+docker-build-frontend:
+	@eval $$(./scripts/get_version.sh env); \
+	docker build \
+		--build-arg VITE_FRONTEND_COMMIT="$$COMMIT_ID" \
+		--build-arg VITE_FRONTEND_BUILD_TIME="$$BUILD_TIME" \
+		-f frontend/Dockerfile -t wechatopenai/weknora-ui:latest frontend/

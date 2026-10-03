@@ -47,8 +47,7 @@ function parseTagAttributes(attrString: string): Record<string, string> {
   ATTRIBUTE_REGEX.lastIndex = 0
   let match: RegExpExecArray | null
   while ((match = ATTRIBUTE_REGEX.exec(attrString)) !== null) {
-    attributes[match[1]] = match[2].replace(/&(amp|quot|apos|lt|gt|#39|#34);/g, (_, entity: string) =>
-      ({ amp: '&', quot: '"', apos: "'", lt: '<', gt: '>', '#39': "'", '#34': '"' })[entity] || _)
+    attributes[match[1]] = match[2]
   }
   return attributes
 }
