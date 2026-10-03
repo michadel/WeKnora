@@ -419,11 +419,8 @@ func fetchNote(
 		return types.FetchedItem{}, fetchFailed
 	}
 	if strings.TrimSpace(content) == "" {
-		// A cleared note still exists. Keep its title as content so ingestion
-		// replaces the stale body instead of silently acknowledging the edit:
-		// skipping here would leave the old text indexed forever.
-		logger.Infof(ctx, "[IMA] note %s (title=%q) is empty, syncing its title only", noteID, f.Title)
-		content = "# " + f.Title + "\n"
+		logger.Infof(ctx, "[IMA] note %s (title=%q) is empty, skipping", noteID, f.Title)
+		return types.FetchedItem{}, fetchSkipped
 	}
 
 	fileName := datasource.SanitizeFileName(f.Title)

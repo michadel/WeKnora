@@ -224,11 +224,11 @@ func (r *chunkRepository) ListPagedChunksByKnowledgeID(
 			db = db.Where("is_enabled = ?", *isEnabled)
 		}
 		if keyword != "" {
-			like := "%" + escapeLikeKeyword(keyword) + "%"
+			like := "%" + keyword + "%"
 
 			// Document type: search content only
 			if knowledgeType != types.KnowledgeTypeFAQ {
-				db = db.Where("content LIKE ? ESCAPE ?", like, likeEscapeChar)
+				db = db.Where("content LIKE ?", like)
 				return db
 			}
 
@@ -240,35 +240,32 @@ func (r *chunkRepository) ListPagedChunksByKnowledgeID(
 			case "standard_question":
 				// Search only in standard_question field of metadata
 				if isPostgres {
-					db = db.Where("metadata->>'standard_question' ILIKE ? ESCAPE ?", like, likeEscapeChar)
+					db = db.Where("metadata->>'standard_question' ILIKE ?", like)
 				} else {
 					// MySQL: metadata->>'$.standard_question' (MySQL 5.7.13+)
 					// 也可以用 JSON_UNQUOTE(JSON_EXTRACT(metadata, '$.standard_question'))
-					db = db.Where("metadata->>'$.standard_question' LIKE ? ESCAPE ?", like, likeEscapeChar)
+					db = db.Where("metadata->>'$.standard_question' LIKE ?", like)
 				}
 			case "similar_questions":
 				// Search in similar_questions array of metadata
 				if isPostgres {
-					db = db.Where("(metadata->'similar_questions')::text ILIKE ? ESCAPE ?", like, likeEscapeChar)
+					db = db.Where("(metadata->'similar_questions')::text ILIKE ?", like)
 				} else {
-					db = db.Where("JSON_EXTRACT(metadata, '$.similar_questions') LIKE ? ESCAPE ?",
-						like, likeEscapeChar)
+					db = db.Where("JSON_EXTRACT(metadata, '$.similar_questions') LIKE ?", like)
 				}
 			case "answers":
 				// Search in answers array of metadata
 				if isPostgres {
-					db = db.Where("(metadata->'answers')::text ILIKE ? ESCAPE ?", like, likeEscapeChar)
+					db = db.Where("(metadata->'answers')::text ILIKE ?", like)
 				} else {
-					db = db.Where("JSON_EXTRACT(metadata, '$.answers') LIKE ? ESCAPE ?", like, likeEscapeChar)
+					db = db.Where("JSON_EXTRACT(metadata, '$.answers') LIKE ?", like)
 				}
 			default:
 				// Search in all fields (content and metadata)
 				if isPostgres {
-					db = db.Where("(content ILIKE ? ESCAPE ? OR metadata::text ILIKE ? ESCAPE ?)",
-						like, likeEscapeChar, like, likeEscapeChar)
+					db = db.Where("(content ILIKE ? OR metadata::text ILIKE ?)", like, like)
 				} else {
-					db = db.Where("(content LIKE ? ESCAPE ? OR CAST(metadata AS CHAR) LIKE ? ESCAPE ?)",
-						like, likeEscapeChar, like, likeEscapeChar)
+					db = db.Where("(content LIKE ? OR CAST(metadata AS CHAR) LIKE ?)", like, like)
 				}
 			}
 		}
@@ -417,7 +414,6 @@ func (r *chunkRepository) SaveChunkRevision(
 			Updates(map[string]interface{}{
 				"content":          common.CleanInvalidUTF8(chunk.Content),
 				"source_content":   common.CleanInvalidUTF8(chunk.SourceContent),
-				"source_locators":  chunk.SourceLocators,
 				"content_revision": chunk.ContentRevision,
 				"is_enabled":       chunk.IsEnabled,
 				"metadata":         chunk.Metadata,

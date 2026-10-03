@@ -28,8 +28,7 @@ type Remapper struct {
 	pair      []int // pair[i] = new line index matched to old line i, or -1
 }
 
-// NewRemapper prepares a best-effort offset mapping.
-// Deprecated: source positions must use RemapBlocks, which verifies full text.
+// NewRemapper prepares a mapping from oldText to newText.
 func NewRemapper(oldText, newText string) *Remapper {
 	oldKeys, oldStarts, oldLen := splitLines(oldText)
 	newKeys, newStarts, newLen := splitLines(newText)
@@ -121,18 +120,17 @@ func RemapBlocks(blocks []types.SourceBlock, oldText, newText string) []types.So
 	if len(blocks) == 0 || oldText == newText {
 		return blocks
 	}
-	// Re-align full block text after markup/URL rewrites. Proportional
-	// interpolation can manufacture a location for deleted or changed content.
-	oldRunes := []rune(oldText)
-	units := make([]Unit, 0, len(blocks))
+	r := NewRemapper(oldText, newText)
+	out := make([]types.SourceBlock, 0, len(blocks))
 	for _, b := range blocks {
-		if b.Start < 0 || b.End > len(oldRunes) || b.End <= b.Start {
+		start, end := r.Map(b.Start), r.Map(b.End)
+		if end <= start {
 			continue
 		}
-		text := normalizeMarkdown(string(oldRunes[b.Start:b.End])).text
-		units = append(units, Unit{Text: text, Locator: b.Locator})
+		b.Start, b.End = start, end
+		out = append(out, b)
 	}
-	return Align(newText, units)
+	return out
 }
 
 // splitLines returns each line's comparison key (without its line break or a

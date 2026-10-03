@@ -5,7 +5,6 @@ import {
   setCitationChunkCache,
 } from '@/utils/citationChunkCache'
 import { useChatReferencesDrawer } from '@/composables/useChatReferencesDrawer'
-import type { ReferenceHighlightTarget } from '@/utils/referenceSources'
 import { citationAnchorText } from '@/utils/citationAnchor'
 
 export type CitationFloatState = {
@@ -172,7 +171,7 @@ export function useCitationPopover(rootRef: Ref<HTMLElement | null>, options: Ci
     scheduleClose()
   }
 
-  const openDrawerForCitation = (payload: ReferenceHighlightTarget) => {
+  const openDrawerForCitation = (payload: { url?: string; chunkId?: string; anchorText?: string; openSource?: boolean }) => {
     const refs = options?.getKnowledgeReferences?.() || []
     if (!referencesDrawer || !refs.length) return false
     referencesDrawer.open({
@@ -201,8 +200,7 @@ export function useCitationPopover(rootRef: Ref<HTMLElement | null>, options: Ci
       const chunkId = resolveChunkId(kbEl)
       // Chat opens the cited document at the cited passage; the embed has no
       // access to original files and keeps the reference list.
-      const source = isChat ? { anchorText: citationAnchorText(kbEl), openSource: true,
-        documentTitle: kbEl.getAttribute('data-doc') || '', knowledgeBaseId: kbEl.getAttribute('data-kb-id') || '' } : {}
+      const source = isChat ? { anchorText: citationAnchorText(kbEl), openSource: true } : {}
       if (openDrawerForCitation({ chunkId, ...source })) return
       void openKb(kbEl)
       return

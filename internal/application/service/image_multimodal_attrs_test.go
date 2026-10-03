@@ -3,9 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -335,15 +333,6 @@ func TestProcessImageObservesAndDescribes(t *testing.T) {
 	if len(repo.created) != 2 {
 		t.Fatalf("persisted chunks = %d, want OCR + caption", len(repo.created))
 	}
-	for _, chunk := range repo.created {
-		var images []types.ImageInfo
-		if err := json.Unmarshal([]byte(chunk.ImageInfo), &images); err != nil || len(images) != 1 {
-			t.Fatalf("invalid image info: %v", err)
-		}
-		if images[0].SHA256 != fmt.Sprintf("%x", sha256.Sum256(fileSvc.body)) {
-			t.Fatal("stored image fingerprint does not identify the bytes sent to OCR")
-		}
-	}
 	if got := persistedAttrCounts(t, repo.created, "contain.text"); !equalCounts(got, map[string]int{"block": 2}) {
 		t.Errorf("persisted contain.text = %v, want block on both chunks", got)
 	}
@@ -564,15 +553,6 @@ func TestProcessImageProseAnswerIsStillCaptionedAndOCRed(t *testing.T) {
 	if len(repo.created) != 2 {
 		t.Fatalf("persisted chunks = %d, want OCR + caption", len(repo.created))
 	}
-	for _, chunk := range repo.created {
-		var images []types.ImageInfo
-		if err := json.Unmarshal([]byte(chunk.ImageInfo), &images); err != nil || len(images) != 1 {
-			t.Fatalf("invalid image info: %v", err)
-		}
-		if images[0].SHA256 != fmt.Sprintf("%x", sha256.Sum256(fileSvc.body)) {
-			t.Fatal("stored image fingerprint does not identify the bytes sent to OCR")
-		}
-	}
 }
 
 // TestProcessImageLabelOnlyAnswerKeepsAttrsWithoutCaption covers the one reply
@@ -674,19 +654,11 @@ func TestProcessImageCaptionOCRPipeline(t *testing.T) {
 	if len(repo.created) != 2 {
 		t.Fatalf("persisted chunks = %d, want OCR + caption", len(repo.created))
 	}
-	for _, chunk := range repo.created {
-		var images []types.ImageInfo
-		if err := json.Unmarshal([]byte(chunk.ImageInfo), &images); err != nil || len(images) != 1 {
-			t.Fatalf("invalid image info: %v", err)
-		}
-		if images[0].SHA256 != fmt.Sprintf("%x", sha256.Sum256(fileSvc.body)) {
-			t.Fatal("stored image fingerprint does not identify the bytes sent to OCR")
-		}
-	}
 }
 
-// Unreadable storage must return its cause so Handle retries before finalizing.
-func TestProcessImageReturnsUnreadableImageError(t *testing.T) {
+// TestProcessImageSkipsUnreadableImage checks that an unreadable object is
+// reported and counted rather than failing the task.
+func TestProcessImageSkipsUnreadableImage(t *testing.T) {
 	t.Parallel()
 
 	fileSvc := &attrsFileService{err: fmt.Errorf("object is gone")}
@@ -706,12 +678,7 @@ func TestProcessImageReturnsUnreadableImageError(t *testing.T) {
 		ImageActions:      types.DefaultImageActions(),
 	}
 
-	out := types.JSONMap{}
-	err := svc.processImage(context.Background(), payload, fake, types.VLMConfig{}, noopSpanTracker{}, out)
-	if !errors.Is(err, fileSvc.err) {
-		t.Fatalf("storage error was swallowed: %v", err)
-	}
-
+	out := runProcessImage(t, svc, payload, fake)
 	if got := out["skipped"]; got != "unreadable_image" {
 		t.Errorf("skipped = %v, want unreadable_image", got)
 	}

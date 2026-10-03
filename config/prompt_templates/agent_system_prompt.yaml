@@ -8,6 +8,9 @@ templates:
       zh-CN:
         name: "纯智能体"
         description: "纯智能体模式的系统提示词（不使用知识库）"
+      zh-TW:
+        name: "純智能體"
+        description: "純智能體模式的系統提示詞（不使用知識庫）"
       en-US:
         name: "Pure Agent"
         description: "System prompt for Pure Agent mode (no Knowledge Bases)"
@@ -30,6 +33,9 @@ templates:
       zh-CN:
         name: "渐进式 RAG 智能体"
         description: "带知识库的渐进式检索增强生成智能体系统提示词"
+      zh-TW:
+        name: "漸進式 RAG 智能體"
+        description: "帶知識庫的漸進式檢索增強生成智能體系統提示詞"
       en-US:
         name: "Progressive RAG Agent"
         description: "System prompt for Progressive Agentic RAG mode with Knowledge Bases"
@@ -57,6 +63,9 @@ templates:
       zh-CN:
         name: "数据分析师"
         description: "基于 DuckDB SQL 的数据分析智能体系统提示词"
+      zh-TW:
+        name: "數據分析師"
+        description: "基於 DuckDB SQL 的數據分析智能體系統提示詞"
       en-US:
         name: "Data Analyst"
         description: "System prompt for Data Analyst agent with DuckDB SQL analysis"
@@ -84,6 +93,9 @@ templates:
       zh-CN:
         name: "维基研究员"
         description: "专用于 Wiki 知识库图谱导航与深度阅读的智能体系统提示词"
+      zh-TW:
+        name: "維基研究員"
+        description: "專用於 Wiki 知識庫圖譜導航與深度閱讀的智能體系統提示詞"
       en-US:
         name: "Wiki Researcher"
         description: "System prompt for Wiki Researcher agent with knowledge graph traversal"
@@ -111,6 +123,9 @@ templates:
       zh-CN:
         name: "Wiki 修复系统提示词"
         description: "用于根据巡检问题修复和优化 Wiki 页面的系统提示词"
+      zh-TW:
+        name: "Wiki 修復系統提示詞"
+        description: "用於根據巡檢問題修復和優化 Wiki 頁面的系統提示詞"
       en-US:
         name: "Wiki Fixer System Prompt"
         description: "System prompt for repairing and optimizing Wiki pages based on linter issues"
@@ -138,6 +153,9 @@ templates:
       zh-CN:
         name: "Wiki + RAG 混合智能体"
         description: "同时启用 Wiki 与向量/关键词索引的知识库场景下使用的系统提示词"
+      zh-TW:
+        name: "Wiki + RAG 混合智能體"
+        description: "同時啟用 Wiki 與向量/關鍵詞索引的知識庫場景下使用的系統提示詞"
       en-US:
         name: "Hybrid RAG + Wiki Agent"
         description: "System prompt for KBs with BOTH Wiki and chunk-level retrieval enabled"
@@ -167,6 +185,9 @@ templates:
       zh-CN:
         name: "技能安装系统提示词"
         description: "用于把上传的技能及其依赖装进沙箱镜像的系统提示词"
+      zh-TW:
+        name: "技能安裝系統提示詞"
+        description: "用於把上傳的技能及其依賴裝進沙箱鏡像的系統提示詞"
       en-US:
         name: "Skill Installer System Prompt"
         description: "System prompt for installing an uploaded skill and its dependencies into the sandbox image"

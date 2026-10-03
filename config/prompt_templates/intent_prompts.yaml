@@ -10,6 +10,9 @@ templates:
       zh-CN:
         name: "问候回复"
         description: "针对问候意图的系统提示词"
+      zh-TW:
+        name: "問候回覆"
+        description: "針對問候意圖的系統提示詞"
       en-US:
         name: "Greeting Response"
         description: "System prompt for greeting intents"
@@ -34,6 +37,9 @@ templates:
       zh-CN:
         name: "闲聊回复"
         description: "针对闲聊意图的系统提示词"
+      zh-TW:
+        name: "閒聊回覆"
+        description: "針對閒聊意圖的系統提示詞"
       en-US:
         name: "Chitchat Response"
         description: "System prompt for casual conversation"
@@ -60,6 +66,9 @@ templates:
       zh-CN:
         name: "追问回复"
         description: "针对上下文追问意图的系统提示词"
+      zh-TW:
+        name: "追問回覆"
+        description: "針對上下文追問意圖的系統提示詞"
       en-US:
         name: "Follow-up Response"
         description: "System prompt for follow-up questions referencing conversation history"
@@ -86,6 +95,9 @@ templates:
       zh-CN:
         name: "图片分析回复"
         description: "针对纯图片理解意图的系统提示词"
+      zh-TW:
+        name: "圖片分析回覆"
+        description: "針對純圖片理解意圖的系統提示詞"
       en-US:
         name: "Image Analysis Response"
         description: "System prompt for pure image understanding"
@@ -111,6 +123,9 @@ templates:
       zh-CN:
         name: "总结回复"
         description: "针对对话总结意图的系统提示词"
+      zh-TW:
+        name: "總結回覆"
+        description: "針對對話總結意圖的系統提示詞"
       en-US:
         name: "Summarize Response"
         description: "System prompt for conversation summarization"
@@ -136,6 +151,9 @@ templates:
       zh-CN:
         name: "网络搜索不可用回复"
         description: "当检测到网络搜索意图但未开启网络搜索时的系统提示词"
+      zh-TW:
+        name: "網絡搜索不可用回覆"
+        description: "當檢測到網絡搜索意圖但未開啟網絡搜索時的系統提示詞"
       en-US:
         name: "Web Search Unavailable Response"
         description: "System prompt when web search intent is detected but web search is not enabled"
@@ -164,6 +182,9 @@ templates:
       zh-CN:
         name: "文档分析回复"
         description: "针对纯文档/文件理解意图的系统提示词"
+      zh-TW:
+        name: "文檔分析回覆"
+        description: "針對純文檔/文件理解意圖的系統提示詞"
       en-US:
         name: "Document Analysis Response"
         description: "System prompt for pure document understanding"

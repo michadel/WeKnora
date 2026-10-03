@@ -10,6 +10,9 @@ templates:
       zh-CN:
         name: "标准改写（含意图分类）"
         description: "包含问题改写、意图分类和图片/附件分析的默认模板"
+      zh-TW:
+        name: "標準改寫（含意圖分類）"
+        description: "包含問題改寫、意圖分類和圖片/附件分析的默認模板"
       en-US:
         name: "Standard Rewrite (with Intent Classification)"
         description: "Default template with query rewriting, intent classification, and image/attachment analysis"
@@ -137,6 +140,9 @@ templates:
       zh-CN:
         name: "标准改写"
         description: "消解指代、补全省略的标准改写规则"
+      zh-TW:
+        name: "標準改寫"
+        description: "消解指代、補全省略的標準改寫規則"
       en-US:
         name: "Standard Rewrite"
         description: "Standard rules for resolving references and completing omissions"
@@ -179,6 +185,9 @@ templates:
       zh-CN:
         name: "严格改写"
         description: "更严格的改写要求，确保问题完整独立"
+      zh-TW:
+        name: "嚴格改寫"
+        description: "更嚴格的改寫要求，確保問題完整獨立"
       en-US:
         name: "Strict Rewrite"
         description: "Stricter requirements for complete and independent questions"

@@ -568,10 +568,6 @@ func (s *chunkService) UpdateDocumentChunk(
 		chunk.SourceContent = chunk.Content
 	}
 	bodyChanged := newContent != chunk.Content
-	if bodyChanged {
-		// Edited evidence no longer maps to the uploaded original.
-		chunk.SourceLocators = nil
-	}
 	chunk.Content = newContent
 	chunk.IsEnabled = newEnabled
 	chunk.ContentRevision++
@@ -751,7 +747,6 @@ func (s *chunkService) rebuildParentContent(ctx context.Context, edited *types.C
 	for _, repl := range replacements {
 		baseRunes = append(append(append([]rune{}, baseRunes[:repl.start]...), []rune(repl.content)...), baseRunes[repl.end:]...)
 	}
-	parent.SourceLocators = nil // Child edits invalidate the original parent evidence.
 	parent.Content = string(baseRunes)
 	for _, conflict := range conflicts {
 		parent.Content = searchutil.JoinChunkContent(parent.Content, conflict.content, "\n\n")

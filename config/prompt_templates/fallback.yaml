@@ -11,6 +11,9 @@ templates:
       zh-CN:
         name: "标准兜底"
         description: "友好告知无法回答并提供建议"
+      zh-TW:
+        name: "標準兜底"
+        description: "友好告知無法回答並提供建議"
       en-US:
         name: "Standard Fallback"
         description: "Friendly message with suggestions when unable to answer"
@@ -41,6 +44,9 @@ templates:
       zh-CN:
         name: "礼貌兜底"
         description: "更加礼貌详细的无法回答提示"
+      zh-TW:
+        name: "禮貌兜底"
+        description: "更加禮貌詳細的無法回答提示"
       en-US:
         name: "Polite Fallback"
         description: "More polite and detailed unable-to-answer message"
@@ -72,6 +78,9 @@ templates:
       zh-CN:
         name: "简洁兜底"
         description: "简短的无法回答提示"
+      zh-TW:
+        name: "簡潔兜底"
+        description: "簡短的無法回答提示"
       en-US:
         name: "Brief Fallback"
         description: "Short unable-to-answer message"
@@ -91,6 +100,9 @@ templates:
       zh-CN:
         name: "模型兜底提示"
         description: "引导模型基于通用知识回答的提示词"
+      zh-TW:
+        name: "模型兜底提示"
+        description: "引導模型基於通用知識回答的提示詞"
       en-US:
         name: "Model Fallback Prompt"
         description: "Prompt to guide model to answer with general knowledge"
@@ -124,6 +136,9 @@ templates:
       zh-CN:
         name: "标准兜底 Prompt"
         description: "知识库无相关结果时引导模型回答的默认提示词"
+      zh-TW:
+        name: "標準兜底 Prompt"
+        description: "知識庫無相關結果時引導模型回答的默認提示詞"
       en-US:
         name: "Standard Fallback Prompt"
         description: "Default prompt that delegates to the model when KB has no relevant results"

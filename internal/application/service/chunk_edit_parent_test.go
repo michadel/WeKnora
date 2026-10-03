@@ -157,8 +157,7 @@ func TestUpdateDocumentChunkPreservesGeneratedQuestionsAcrossRevision(t *testing
 	repo := &editableChunkRepo{chunk: &types.Chunk{
 		ID: "chunk", TenantID: 1, KnowledgeID: "knowledge", KnowledgeBaseID: "kb",
 		Content: "old body", SourceContent: "old body", ContentRevision: 0,
-		SourceLocators: types.SourceLocators{{Type: "pdf", Page: 1, Mapping: "exact", Quote: "old body"}},
-		ChunkType:      types.ChunkTypeText, IsEnabled: true, IndexStatus: "ready", Metadata: metadataJSON,
+		ChunkType: types.ChunkTypeText, IsEnabled: true, IndexStatus: "ready", Metadata: metadataJSON,
 	}}
 	service := &chunkService{
 		chunkRepository: repo,
@@ -182,9 +181,6 @@ func TestUpdateDocumentChunkPreservesGeneratedQuestionsAcrossRevision(t *testing
 	updated, err := service.UpdateDocumentChunk(ctx, "chunk", &newContent, nil, nil)
 	if err != nil {
 		t.Fatalf("update chunk: %v", err)
-	}
-	if len(updated.SourceLocators) != 0 {
-		t.Fatal("edited content retained source positions from the original")
 	}
 	updatedMetadata, err := updated.DocumentMetadata()
 	if err != nil {
@@ -223,7 +219,6 @@ func TestRebuildParentContentPreservesConflictingEdits(t *testing.T) {
 		parent: &types.Chunk{
 			ID: "parent", TenantID: 1, ChunkType: types.ChunkTypeParentText,
 			SourceContent: "abcdefghij", Content: "abcdefghij", StartAt: 0, EndAt: 10,
-			SourceLocators: types.SourceLocators{{Type: "pdf", Page: 1}},
 		},
 		children: []*types.Chunk{
 			{
@@ -244,9 +239,6 @@ func TestRebuildParentContentPreservesConflictingEdits(t *testing.T) {
 	}
 	if repo.updated == nil {
 		t.Fatal("parent was not updated")
-	}
-	if len(repo.updated.SourceLocators) != 0 {
-		t.Fatal("rebuilt parent retained stale source positions")
 	}
 	for _, want := range []string{"OLDER EDIT BODY", "NEWER EDIT BODY"} {
 		if !strings.Contains(repo.updated.Content, want) {

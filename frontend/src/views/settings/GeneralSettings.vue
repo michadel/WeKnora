@@ -20,6 +20,7 @@
             style="width: 280px;"
           >
             <t-option value="zh-CN" :label="$t('language.zhCN')">{{ $t('language.zhCN') }}</t-option>
+            <t-option value="zh-TW" :label="$t('language.zhTW')">{{ $t('language.zhTW') }}</t-option>
             <t-option value="en-US" :label="$t('language.enUS')">{{ $t('language.enUS') }}</t-option>
             <t-option value="ru-RU" :label="$t('language.ruRU')">{{ $t('language.ruRU') }}</t-option>
             <t-option value="ko-KR" :label="$t('language.koKR')">{{ $t('language.koKR') }}</t-option>
@@ -43,6 +44,7 @@
           >
             <t-option value="light" :label="$t('theme.light')">{{ $t('theme.light') }}</t-option>
             <t-option value="dark" :label="$t('theme.dark')">{{ $t('theme.dark') }}</t-option>
+            <t-option value="yuta" :label="$t('theme.yuta')">{{ $t('theme.yuta') }}</t-option>
             <t-option value="system" :label="$t('theme.system')">{{ $t('theme.system') }}</t-option>
           </t-select>
         </div>

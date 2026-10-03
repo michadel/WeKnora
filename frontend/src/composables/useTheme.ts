@@ -5,13 +5,13 @@ import {
   migratePreferencesIntoUser,
 } from './preferenceStorage'
 
-export type ThemeMode = 'light' | 'dark' | 'system'
+export type ThemeMode = 'light' | 'dark' | 'yuta' | 'system'
 
 const THEME_KEY = 'theme'
 
 function loadTheme(): ThemeMode {
   const v = loadPreference(THEME_KEY)
-  if (v === 'light' || v === 'dark' || v === 'system') return v
+  if (v === 'light' || v === 'dark' || v === 'yuta' || v === 'system') return v
   return 'light'
 }
 
@@ -61,16 +61,17 @@ function syncWailsNativeChrome(effective: 'light' | 'dark') {
 }
 
 function applyTheme(mode: ThemeMode) {
-  const effective = mode === 'system' ? getSystemTheme() : mode
+  // Yuta is a light theme — treat it as 'light' for Wails native chrome sync
+  const effective = mode === 'system' ? getSystemTheme() : (mode === 'yuta' ? 'light' : mode)
   if (lastEffective === effective) return
   lastEffective = effective
-  document.documentElement.setAttribute('theme-mode', effective)
+  document.documentElement.setAttribute('theme-mode', mode)
   syncWailsNativeChrome(effective)
 }
 
 export function useTheme() {
   function setTheme(mode: ThemeMode): boolean {
-    if (mode !== 'light' && mode !== 'dark' && mode !== 'system') return false
+    if (mode !== 'light' && mode !== 'dark' && mode !== 'yuta' && mode !== 'system') return false
     currentTheme.value = mode
     savePreference(THEME_KEY, mode)
     applyTheme(mode)
