@@ -28,6 +28,7 @@ interface Settings {
   selectedAgentId: string;  // 当前选中的智能体ID
   selectedAgentSourceTenantId: string | null;  // 当使用共享智能体时，来源空间 ID（用于后端 model/KB/MCP 解析）
   autoCheckUpdate?: boolean; // 是否自动检查并下载更新
+  customLogoUrl?: string; // 自定义 Logo URL
 }
 
 // Agent 配置接口
@@ -109,6 +110,7 @@ const defaultSettings: Settings = {
   selectedAgentId: BUILTIN_QUICK_ANSWER_ID,  // 默认选中快速问答模式
   selectedAgentSourceTenantId: null as string | null,  // 共享智能体来源空间 ID
   autoCheckUpdate: true,
+  customLogoUrl: "", // 自定义 Logo URL（空字符串表示使用默认 Logo）
 };
 
 export const useSettingsStore = defineStore("settings", {

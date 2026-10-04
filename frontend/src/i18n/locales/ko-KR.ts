@@ -2904,7 +2904,6 @@ export default {
     themeDescription: '인터페이스의 표시 테마를 선택하세요. 시스템 설정에 따라 자동 전환을 지원합니다',
     light: '라이트',
     dark: '다크',
-    yuta: '라이트(Yuta)',
     system: '시스템 설정',
     selectTheme: '테마 선택'
   },
@@ -3173,8 +3172,6 @@ export default {
     versionDescription: '애플리케이션 서비스(weknora-app)의 버전 번호',
     frontendVersionLabel: 'UI 버전',
     frontendVersionDescription: 'UI(weknora-ui) 빌드 버전 번호',
-    frontendBuildTimeLabel: 'UI 빌드 시간',
-    frontendBuildTimeDescription: 'UI(weknora-ui) 빌드 시간',
     versionMismatch: '앱 버전과 일치하지 않음',
     buildTimeLabel: '빌드 시간',
     buildTimeDescription: '시스템이 빌드된 시간',

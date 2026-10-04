@@ -6,7 +6,6 @@ import TDesign from "tdesign-vue-next";
 // 引入组件库的少量全局样式变量
 import "tdesign-vue-next/dist/tdesign.css";
 import "@/assets/theme/theme.css";
-import "@/assets/theme/theme-yuta.css"; // Yuta 淺色主題（外加）
 import "@/assets/theme/theme-hardcoded-fix.css"; // 硬編碼顏色修復（外加）
 import "@/assets/theme/tdesign-overrides.less";
 import "@/assets/dropdown-menu.less";
@@ -21,16 +20,12 @@ import { initFont } from "@/composables/useFont";
 import { installTDesignIconOfflineGuard } from "@/utils/tdesign-icon-offline";
 import { installAutofillGuard } from "@/utils/disable-autofill";
 import { useAuthStore } from "@/stores/auth";
-// Yuta 主題外部翻譯（外加檔案，不修改核心 i18n）
-import { loadYutaThemeTranslations } from "@/i18n/yutaThemeLoader";
 
 // 必须在 Vue 组件挂载之前执行，避免 tdesign-icons 运行时请求 tdesign.gtimg.com
 installTDesignIconOfflineGuard();
 
 initTheme();
 initFont();
-// 載入 Yuta 主題翻譯（外加）
-loadYutaThemeTranslations(i18n);
 
 async function bootstrap() {
   const app = createApp(App);

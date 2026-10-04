@@ -4314,8 +4314,6 @@ export default {
     versionDescription: 'Version of the application service (weknora-app)',
     frontendVersionLabel: 'UI Version',
     frontendVersionDescription: 'Build version of the UI (weknora-ui)',
-    frontendBuildTimeLabel: 'UI Build Time',
-    frontendBuildTimeDescription: 'Build time of the UI (weknora-ui)',
     versionMismatch: 'Mismatch with app version',
     buildTimeLabel: 'Build Time',
     buildTimeDescription: 'Time when the system was built',
@@ -5132,7 +5130,6 @@ export default {
     themeDescription: 'Choose the display theme for the interface, supports automatic switching with system settings',
     light: 'Light',
     dark: 'Dark',
-    yuta: 'Light (Yuta)',
     system: 'Follow System',
     selectTheme: 'Select theme'
   },

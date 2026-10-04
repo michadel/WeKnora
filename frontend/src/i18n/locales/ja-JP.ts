@@ -5130,7 +5130,6 @@ export default {
     themeDescription: 'インターフェースの表示テーマを選択します。システム設定に合わせた自動切り替えにも対応しています',
     light: 'ライト',
     dark: 'ダーク',
-    yuta: 'ライト(Yuta)',
     system: 'システムに従う',
     selectTheme: 'テーマを選択'
   },

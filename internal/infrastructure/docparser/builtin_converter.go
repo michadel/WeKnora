@@ -181,6 +181,7 @@ func csvToMarkdown(data []byte) (string, error) {
 	reader := csv.NewReader(strings.NewReader(string(data)))
 	reader.LazyQuotes = true
 	reader.TrimLeadingSpace = true
+	reader.FieldsPerRecord = -1 // Allow variable number of fields per record
 
 	records, err := reader.ReadAll()
 	if err != nil {

@@ -44,7 +44,6 @@
           >
             <t-option value="light" :label="$t('theme.light')">{{ $t('theme.light') }}</t-option>
             <t-option value="dark" :label="$t('theme.dark')">{{ $t('theme.dark') }}</t-option>
-            <t-option value="yuta" :label="$t('theme.yuta')">{{ $t('theme.yuta') }}</t-option>
             <t-option value="system" :label="$t('theme.system')">{{ $t('theme.system') }}</t-option>
           </t-select>
         </div>

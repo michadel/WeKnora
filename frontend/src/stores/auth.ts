@@ -479,7 +479,14 @@ export const useAuthStore = defineStore('auth', () => {
     } catch {
       /* ignore */
     }
+    // 保存主題設置，讓 logout 後保持相同主題
+    const currentTheme = localStorage.getItem('weknora_theme')
     reloadUserPreferences()
+    // 恢復主題設置
+    if (currentTheme) {
+      localStorage.setItem('weknora_theme', currentTheme)
+      reloadThemeFromStorage()
+    }
   }
 
   const initFromStorage = () => {

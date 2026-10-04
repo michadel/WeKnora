@@ -2906,7 +2906,6 @@ export default {
     themeDescription: '选择界面的显示主题，支持跟随系统自动切换',
     light: '浅色',
     dark: '深色',
-    yuta: '浅色(Yuta)',
     system: '跟随系统',
     selectTheme: '选择主题'
   },
@@ -3175,8 +3174,6 @@ export default {
     versionDescription: '当前应用服务（weknora-app）的版本号',
     frontendVersionLabel: 'UI 版本',
     frontendVersionDescription: '当前 UI 界面（weknora-ui）的构建版本号',
-    frontendBuildTimeLabel: 'UI 构建时间',
-    frontendBuildTimeDescription: '当前 UI 界面（weknora-ui）的构建时间',
     versionMismatch: '与应用版本不一致',
     buildTimeLabel: '构建时间',
     buildTimeDescription: '系统构建的时间',

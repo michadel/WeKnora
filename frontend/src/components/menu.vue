@@ -3,7 +3,7 @@
         <!-- 展开时：Logo + 搜索/折叠按钮同行 -->
         <div class="logo_row" v-if="!uiStore.sidebarCollapsed">
             <div class="logo_box" @click="router.push('/platform/knowledge-bases')" style="cursor: pointer;">
-                <img class="logo" src="@/assets/img/weknora.png" alt="">
+                <img class="logo" :src="logoUrl" alt="">
                 <sup v-if="isLiteEdition" class="lite-badge">Lite</sup>
             </div>
             <div class="logo_actions">
@@ -271,6 +271,7 @@ import { useBrowserConnectionStore } from '@/stores/browserConnection';
 import { useOrganizationStore } from '@/stores/organization';
 import { useUIStore } from '@/stores/ui';
 import { useCommandPaletteStore } from '@/stores/commandPalette';
+import { useSettingsStore } from '@/stores/settings';
 import { MessagePlugin, DialogPlugin, Icon as TIcon } from "tdesign-vue-next";
 import UserMenu from '@/components/UserMenu.vue';
 import TenantSelector from '@/components/TenantSelector.vue';
@@ -381,6 +382,16 @@ type MenuItem = { title: string; icon: string; path: string; childrenPath?: stri
 const { menuArr, visibleMenuArr } = storeToRefs(usemenuStore);
 let activeSubmenu = ref<string>('');
 const isLiteEdition = ref(false);
+
+// Dynamic logo URL
+const settingsStore = useSettingsStore();
+const defaultLogoPath = '/assets/logo/logo.png';
+const logoUrl = computed(() => {
+  if (settingsStore.settings.customLogoUrl) {
+    return settingsStore.settings.customLogoUrl
+  }
+  return defaultLogoPath
+});
 
 // 批量管理状态
 const batchMode = ref(false)

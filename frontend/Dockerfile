@@ -39,10 +39,10 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm \
   if [ -n "$NPM_REGISTRY" ]; then \
     npm ci --registry="$NPM_REGISTRY"; \
-  se \
+  else \
     npm ci; \
-  
-  
+  fi
+
 COPY . .
 # After npm ci so a new commit hash does not bust the dependency layer.
 ARG VITE_FRONTEND_COMMIT=unknown
